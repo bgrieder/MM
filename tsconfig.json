@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "outDir": "dist",
+        "jsx": "react",
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "lib": [
+            "dom",
+            "es2015.promise",
+            "es5"
+        ]
+    },
+    "exclude": [
+        "dist",
+        "node_modules",
+        "deprecated"
+    ]
+}

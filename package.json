@@ -1,0 +1,18 @@
+{
+  "name": "M",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "mocha dist/test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.46",
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2",
+    "source-map-support": "^0.4.6",
+    "typescript": "^2.1.1"
+  }
+}
