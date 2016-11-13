@@ -10,7 +10,7 @@ A small library that implements a few useful Monads for functional programming.
  - typings automatically loaded when programming in Typescript
  
  
- **Write shorter immutable code**
+**Write shorter immutable code**
  
  Instead of 
  
@@ -32,11 +32,11 @@ const value = option(input).map(calculateFromInput).getOrElse(getDefaultValue)
   
 **Write lazy evaluated code**
   
-  ```
-  alist(hugeArray).dropAt(2).map(expensiveOp).takeFirst(3)
+```
+alist(hugeArray).dropAt(2).map(expensiveOp).takeFirst(3)
   
-  ```
-  is not evaluated (iterated) until `toArray` is called on it, and when it is, only five iterations and 3 calls to `map` are performed 
+```
+is not evaluated (iterated) until `toArray` is called on it, and when it is, only five iterations and 3 calls to `map` are performed 
   
 Usage
 -----
