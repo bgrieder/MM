@@ -931,21 +931,24 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
             const otherHasNext = otherIt.iterate();
             let index = -1;
 
+
             if ( otherHasNext ) {
-                const firstVal = otherIt.current();
-                //find first val in tit
-                while ( thisIt.iterate() ) {
-                    index++
-                    if ( eq( thisIt.current(), firstVal ) ) {
-                        const itToTest = thisIt.slice( index );
-                        if ( thisIt.equals( otherIt ) ) {
-                            return true
-                        }
-                        //keep searching
-                    }
-                }
-                //not found on tit - return false
-                return false
+                //FIXME: Algorithm needs review
+                throw new Error('Algorithm not implemented for backward iterator')
+                // const firstVal = otherIt.current();
+                // //find first val in tit
+                // while ( thisIt.iterate() ) {
+                //     index++
+                //     if ( eq( thisIt.current(), firstVal ) ) {
+                //         const itToTest = thisIt.slice( index );
+                //         if ( thisIt.equals( otherIt ) ) {
+                //             return true
+                //         }
+                //         //keep searching
+                //     }
+                // }
+                // //not found on tit - return false
+                // return false
             }
             else {
                 //it is an empty sequence, return true

@@ -615,17 +615,7 @@ var SeqImpl = (function (_super) {
             var otherHasNext = otherIt.iterate();
             var index = -1;
             if (otherHasNext) {
-                var firstVal = otherIt.current();
-                while (thisIt.iterate()) {
-                    index++;
-                    if (Utils_1.eq(thisIt.current(), firstVal)) {
-                        var itToTest = thisIt.slice(index);
-                        if (thisIt.equals(otherIt)) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
+                throw new Error('Algorithm not implemented for backward iterator');
             }
             else {
                 return true;
