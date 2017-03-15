@@ -41,9 +41,9 @@ is not evaluated (iterated) until `toArray` is called on it, and when it is, onl
 Usage
 -----
 
-*Typescript / ES6*: `import { some, list, .. } from 'MM'`
+*Typescript / ES6*: `import { some, list, .. } from 'm.m'`
 
-*ES5* `const MM = require('MM')`
+*ES5* `const MM = require('m.m')`
 
 License
 -------
