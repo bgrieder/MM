@@ -1,20 +1,19 @@
 {
   "name": "M",
-  "version": "1.0.0",
-  "private": true,
+  "version": "1.0.0-alpha.1",
+  "private": false,
   "scripts": {
     "build": "tsc",
     "test": "mocha dist/test"
   },
   "typings": "dist/index.d.ts",
-  "dependencies": {},
   "devDependencies": {
-    "@types/chai": "^3.4.34",
-    "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.46",
+    "@types/chai": "^3.4.35",
+    "@types/mocha": "^2.2.40",
+    "@types/node": "^7.0.8",
     "chai": "^3.5.0",
-    "mocha": "^3.1.2",
-    "source-map-support": "^0.4.6",
-    "typescript": "^2.1.1"
+    "mocha": "^3.2.0",
+    "source-map-support": "^0.4.12",
+    "typescript": "^2.2.1"
   }
 }
