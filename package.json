@@ -1,7 +1,12 @@
 {
-  "name": "M",
+  "name": "MM",
   "version": "1.0.0-alpha.2",
+  "description": "A few missing monads for javascript and typescript",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bgrieder/MM.git"
+  },
   "scripts": {
     "build": "tsc",
     "test": "mocha dist/test"

@@ -1,7 +1,7 @@
-M
-==
+MM
+===
 
-**The missing Monads for Javascript and Typescript.** 
+**A few  Missing Monads for Javascript and Typescript.**
 
 A small library that implements a few useful Monads for functional programming.
  - no external dependencies
@@ -41,9 +41,9 @@ is not evaluated (iterated) until `toArray` is called on it, and when it is, onl
 Usage
 -----
 
-*Typescript / ES6*: `import { some, list, .. } from 'M'`
+*Typescript / ES6*: `import { some, list, .. } from 'MM'`
 
-*ES5* `const M = require('M')`
+*ES5* `const MM = require('MM')`
 
 License
 -------
