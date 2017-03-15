@@ -5,9 +5,9 @@ before_script:
 - npm run build
 deploy:
   provider: npm
+  user: bgrieder
   email: bruno.grieder@gmail.com
   api_key:
     secure: ikW3IdH1i9H1PQM7MwTJuuVJd5orzQ5cjOBTzyNEEPZroExck9kQNB/6VycwXYbeW9y3YPqVYV7DHkQj7bSDNVHNMpI3YYe/APPbXoBR4kwD4za79ztm9G4uHWwTXmTP7xIFA2Jbn3+HoaDEKjb1QagIv3a/anAjCGMt9j8Hw2Ewqi4Yt5MxsaZbj738d08Hi1RKhM9ZwTd9c9fup5kEbLX55aM0IH1hwr3oVW+5ll1v//M8mU0+uFZgiZQEoiNpEY4YRPDc7eBI3cZIJsNQeNmhJK9w8Rap5u7BheQzj+5uSQWe35tmS3JicmXT1NMVk1AXbhB29itl7L2VYfJfMc4sUSWKG5A9dpUEnkA2oqedLvCFR3+V9UQ310FH0BFogsXpUVewm2qp/LTHQ8CIZoO9O6+maPCjSX/EitQ1F6tsSduDD+HFPvCBX6qS5NAFEiAKBd5rSSJqWfTSpOYVd/J6Fbhnptocrr5hqBKcaJCdpmNCnKV7DpoyuDpr1++qLhYBqiDdoydX04CnablBnyi8imn0B25qPwXN3nUTQdkMRk9LXvCeLD8zlkXsIV1G5NjTwd1BupK5T4dqqKUrCOPG7bOkoiWOzGT4hYtbnvRQaxGTQUXwnczwLj3dgV7vKHxYp1g+VHKJhXD9+IGCHDIJBSq6iGCttVgU6ds8kM4=
   on:
     tags: true
-    repo: bgrieder/M
