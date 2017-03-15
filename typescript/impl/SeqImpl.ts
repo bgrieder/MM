@@ -196,6 +196,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
         return this.newInstance<A>( iterable( nfit, nbit, len ) )
     }
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * Builds a new sequence made of the first n elements
      * Identical to takeFirst()
@@ -249,6 +250,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
         return [ false, undefined ]
     }
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * Selects an element by its index in the sequence iterating forward
      * Throws if not found
@@ -553,9 +555,10 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
                     else {
                         hasNext = it.iterate()
                         if ( hasNext ) {
+                            let drop = false
                             do {
                                 value = it.current()
-                                var drop = test( value )
+                                drop = test( value )
                                 if ( drop ) {
                                     temp.push( value )
                                     hasNext = it.iterate()
@@ -790,12 +793,12 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
             let newOther: Seq<A> = other;
             return iterator<A>(
                 () => {
+                    let drop: number
                     hasNext = it.iterate()
                     if ( hasNext ) {
                         len++
                         do {
                             value = it.current()
-                            var drop: number
                             if ( other.length === 0 ) {
                                 drop = -1
                             }
@@ -929,7 +932,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
         const otherEndIt = ( thisIt: Iterator<A>, otherIt: Iterator<A> ): boolean => {
 
             const otherHasNext = otherIt.iterate();
-            let index = -1;
+            // let index = -1;
 
 
             if ( otherHasNext ) {
@@ -982,7 +985,8 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
      */
     startsWith( it: Iterable<A> ): boolean {
 
-        var [thisEndIt, otherEndIt] = this._startsEndsWith()
+        let thisEndIt: ( thisIt: Iterator<A>, otherIt: Iterator<A> ) => boolean, otherEndIt: ( thisIt: Iterator<A>, otherIt: Iterator<A> ) => boolean
+        [ thisEndIt, otherEndIt ] = this._startsEndsWith()
 
         if ( this.isForward && it.fit ) {
 

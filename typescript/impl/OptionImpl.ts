@@ -196,6 +196,7 @@ export class OptionImpl<A> extends SeqImpl<A> implements Option<A> {
 export class Some<A> extends OptionImpl<A> {}
 export class None extends OptionImpl<any> {}
 
+//noinspection JSUnusedGlobalSymbols
 /**
  * Create a `None` if `value` is `undefined` or `null`
  * otherwise create a `Some` holding that value
