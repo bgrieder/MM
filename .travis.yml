@@ -1,12 +1,13 @@
 sudo: false
 language: node_js
 node_js: 7
-
 before_script:
-  - "npm run build"
-
+- npm run build
 deploy:
-   provider: npm
-   on:
-     tags: true
-   skip_cleanup: true
+  provider: npm
+  email: bruno.grieder@gmail.com
+  api_key:
+    secure: JG2/i9CAgESe78gpnYslXlWXvq6VkbekTwF/Nx6bIQoipl3gKtA4RqxDr1sLUvx/R4MnfFUECGwJ97bqjDXjsy+cGaDeXfCTNV1sJhI+yo7hpgrdiI3AS0FpL42z73ivxioe1cp2F4bfkIY0dNCwbLUXXNhEuJi85LEqg8WGc3e1DD8sTPaKE9LyrmB1ExpQeb7AgCfCScRqazbaeaT//tRLK36Pl3ommfO2IKd5J8ENtwoOoFTGdzqa75K90fGewJrAQVowsrpcWxDDDHKPWZhB5jOWXZnxa/4MIY0LU84p/lLnNIHcGnrmoQYvjatXo/vmHhlXDO6Z6lr3ChFEm222U5VyGL3m7WRdUDuQgDMG4WEo8fHp2rAGCOhr9hsEqYE/dC4cY0uNE8sal7S6xh5/vrWTG/V2UQ32myQZkHhlrlmpv+OiTeRriW4T1V/k6L2isfASrVBRInuIzh59iDngP6AM+inL/1v7v4bHAbi/yxPtl4AJEGP7bHYBrqHbmt7mIjSrmNU3NN88Jw8Ex9ugWO1Ghs/aSyvkiv8NiHAS7Z3jvU+XBQgpXhn1fEhILbuSPgc9sCFUTwfZ3xu+xbovVAhD/STlU8Cl/YlL6z6Z2UyZAj4SuscOqttQpNLWnzMho31E7OtEWvz4R+aj+k+Zz9+sGJErNz+Vr5BOPB4=
+  on:
+    tags: true
+    repo: bgrieder/M
