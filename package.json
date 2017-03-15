@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "tsc",
     "test": "mocha dist/test"
   },
   "typings": "dist/index.d.ts",
