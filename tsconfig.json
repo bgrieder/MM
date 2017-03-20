@@ -10,9 +10,12 @@
         "sourceMap": true,
         "experimentalDecorators": true,
         "suppressImplicitAnyIndexErrors": true,
+        "alwaysStrict": true,
+//        "strictNullChecks":true,
         "lib": [
             "dom",
-            "es2015.promise",
+            "es2015.Promise",
+            "es2015.Symbol",
             "es5"
         ]
     },

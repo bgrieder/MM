@@ -18,6 +18,80 @@ export class OptionImpl<A> extends SeqImpl<A> implements Option<A> {
         return new Some<U>( it )
     }
 
+
+    /**
+     * Returns a <code>Some</code> containing the result of
+     * applying <code>someFn</code> to this <code>Option</code>'s contained
+     * value, '''if''' this option is
+     * nonempty '''and''' <code>someFn</code> is defined
+     * Returns <code>None</code> otherwise.
+     */
+    collect<U>( partialFunction: {someFn?: ( value: A ) => U} ): Option<U> {
+        return partialFunction.someFn ? this.map<U>( partialFunction.someFn ) : none()
+    }
+
+    /**
+     * Returns true is these two options are equal
+     */
+    equals( option: Option<A> ): boolean {
+        if ( !option.isEmpty() ) {
+            const it = this.fit();
+            const oit = option.fit();
+            if ( it.iterate() && oit.iterate() ) {
+                let value = it.current();
+                let other = oit.current();
+                if ( typeof other === 'object' && typeof value === 'object' && other[ 'equals' ] && other[ 'equals' ]( value ) ) {
+                    return true
+                }
+                return other === value;
+            }
+            return false
+        }
+        return false
+    }
+
+    /**
+     * Returns this <code>Option</code> if it is nonempty '''and''' applying the function <code>test</code> to
+     * this <code>Option</code>'s value returns true. Otherwise, return <code>None</code>.
+     */
+    filter( f: ( value: A ) => boolean ): Option<A> { return <Option<A>>super.filter( f )}
+
+    /**
+     * Returns this <code>Option</code> if it is nonempty '''and''' applying the function <code>test</code> to
+     * this <code>Option</code>'s value returns false. Otherwise, return <code>None</code>.
+     */
+    filterNot( test: ( value: A ) => boolean ): Option<A> { return this.filter( ( val: A ) => !test( val ) )}
+
+    /**
+     * Returns the result of applying <code>f</code> to this <code>Option</code>'s value if
+     * this <code>Option</code> is nonempty.
+     * Returns <code>None</code> if this <code>Option</code> is empty.
+     * Slightly different from `map` in that <code>f</code> is expected to
+     * return an <code>Option</code> (which could be <code>None</code>).
+     *
+     * @note: flatMap '''will''' run the Option
+     *
+     *  @see map
+     *  @see forEach
+     */
+    flatMap<U>( f: ( value: A ) => Option<U> ): Option<U> { return <Option<U>> super.flatMap( f )}
+
+    /**
+     * Flattens two layers of <code>Option</code> into one
+     * More precisely flattens an Option<Iterable<A>> into an Option<A>
+     */
+    flatten<U>(): Option<U> {return <Option<U>>super.flatten()}
+
+    /**
+     * Returns the result of applying <code>f</code>empty to this <code>Option</code>'s
+     *  value if the <code>Option</code> is empty;  otherwise, applies
+     *  `f` to the value.
+     *
+     *  @note This is equivalent to <code>Option.map(f).getOrElse(ifEmpty)</code>
+     */
+    fold<U>( ifEmpty: () => U, f: ( value: A ) => U ): U { return this.map( f ).getOrElse( ifEmpty ) }
+
+
     /**
      * Returns the Option value or throws an exception if there is none
      * Identical to run()
@@ -89,46 +163,7 @@ export class OptionImpl<A> extends SeqImpl<A> implements Option<A> {
      */
     map<U>( f: ( value: A ) => U ): Option<U> { return this.newInstance( super.map<U>( f ) )}
 
-    /**
-     * Returns the result of applying <code>f</code>empty to this <code>Option</code>'s
-     *  value if the <code>Option</code> is empty;  otherwise, applies
-     *  `f` to the value.
-     *
-     *  @note This is equivalent to <code>Option.map(f).getOrElse(ifEmpty)</code>
-     */
-    fold<U>( ifEmpty: () => U, f: ( value: A ) => U ): U { return this.map( f ).getOrElse( ifEmpty ) }
 
-    /**
-     * Returns this <code>Option</code> if it is nonempty '''and''' applying the function <code>test</code> to
-     * this <code>Option</code>'s value returns true. Otherwise, return <code>None</code>.
-     */
-    filter( f: ( value: A ) => boolean ): Option<A> { return <Option<A>>super.filter( f )}
-
-    /**
-     * Flattens two layers of <code>Option</code> into one
-     * More precisely flattens an Option<Iterable<A>> into an Option<A>
-     */
-    flatten<U>(): Option<U> {return <Option<U>>super.flatten()}
-
-    /**
-     * Returns the result of applying <code>f</code> to this <code>Option</code>'s value if
-     * this <code>Option</code> is nonempty.
-     * Returns <code>None</code> if this <code>Option</code> is empty.
-     * Slightly different from `map` in that <code>f</code> is expected to
-     * return an <code>Option</code> (which could be <code>None</code>).
-     *
-     * @note: flatMap '''will''' run the Option
-     *
-     *  @see map
-     *  @see forEach
-     */
-    flatMap<U>( f: ( value: A ) => Option<U> ): Option<U> { return <Option<U>> super.flatMap( f )}
-
-    /**
-     * Returns this <code>Option</code> if it is nonempty '''and''' applying the function <code>test</code> to
-     * this <code>Option</code>'s value returns false. Otherwise, return <code>None</code>.
-     */
-    filterNot( test: ( value: A ) => boolean ): Option<A> { return this.filter( ( val: A ) => !test( val ) )}
 
     /**
      * Returns true if this option is nonempty '''and''' the function
@@ -154,17 +189,6 @@ export class OptionImpl<A> extends SeqImpl<A> implements Option<A> {
     forEach<U>( f: ( value: A ) => U ): void { this.map( f ).getOrElse( () => undefined ) }
 
     /**
-     * Returns a <code>Some</code> containing the result of
-     * applying <code>someFn</code> to this <code>Option</code>'s contained
-     * value, '''if''' this option is
-     * nonempty '''and''' <code>someFn</code> is defined
-     * Returns <code>None</code> otherwise.
-     */
-    collect<U>( partialFunction: {someFn?: ( value: A ) => U} ): Option<U> {
-        return partialFunction.someFn ? this.map<U>( partialFunction.someFn ) : none()
-    }
-
-    /**
      * Returns this <code>Option</code> if it is nonempty,
      *  otherwise return the result of evaluating `alternative`.
      */
@@ -173,24 +197,13 @@ export class OptionImpl<A> extends SeqImpl<A> implements Option<A> {
     }
 
     /**
-     * Returns true is these two options are equal
+     * Convert this Option to a Promise
+     * so that it can be chained using await
      */
-    equals( option: Option<A> ): boolean {
-        if ( !option.isEmpty() ) {
-            const it = this.fit();
-            const oit = option.fit();
-            if ( it.iterate() && oit.iterate() ) {
-                let value = it.current();
-                let other = oit.current();
-                if ( typeof other === 'object' && typeof value === 'object' && other[ 'equals' ] && other[ 'equals' ]( value ) ) {
-                    return true
-                }
-                return other === value;
-            }
-            return false
-        }
-        return false
+    get toPromise(): Promise<A> {
+        return this.map(v => Promise.resolve(v)).getOrElse(() => Promise.reject(new Error( 'No such element None.get' )))
     }
+
 }
 
 export class Some<A> extends OptionImpl<A> {}

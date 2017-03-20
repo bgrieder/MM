@@ -6,15 +6,88 @@ import {Seq} from './Seq'
 export interface Option<A> extends Seq<A> {
 
     /**
+     * Returns a <code>Some</code> containing the result of
+     * applying <code>someFn</code> to this <code>Option</code>'s contained
+     * value, '''if''' this option is
+     * nonempty '''and''' <code>someFn</code> is defined
+     * Returns <code>None</code> otherwise.
+     */
+    collect<U>( partialFunction: {someFn?: ( value: A ) => U} ): Option<U>
+
+    /**
+     * Returns true is these two options are equal
+     */
+    equals( option: Option<A> ): boolean
+
+    /**
+     * Returns true if this option is nonempty '''and''' the function
+     * <code>test</code> returns true when applied to this <code>Option</code>'s value.
+     * Otherwise, returns false.
+     */
+    exists( test: ( value: A ) => boolean ): boolean
+
+    /**
+     * Returns this <code>Option</code> if it is nonempty '''and''' applying the function <code>test</code> to
+     * this <code>Option</code>'s value returns true. Otherwise, return <code>None</code>.
+     */
+    filter( f: ( value: A ) => boolean ): Option<A>
+
+    /**
+     * Returns this <code>Option</code> if it is nonempty '''and''' applying the function <code>test</code> to
+     * this <code>Option</code>'s value returns false. Otherwise, return <code>None</code>.
+     */
+    filterNot( test: ( value: A ) => boolean ): Option<A>
+
+    /**
+     * Returns the result of applying <code>f</code> to this <code>Option</code>'s value if
+     * this <code>Option</code> is nonempty.
+     * Returns <code>None</code> if this <code>Option</code> is empty.
+     * Slightly different from `map` in that <code>f</code> is expected to
+     * return an <code>Option</code> (which could be <code>None</code>).
+     *
+     * @note: flatMap '''will''' run the Option
+     *
+     *  @see map
+     *  @see forEach
+     */
+    flatMap<U>( f: ( value: A ) => Option<U> ): Option<U>
+
+    /**
+     * Flattens two layers of <code>Option</code> into one
+     * More precisely flattens an Option<Iterable<A>> into an Option<A>
+     */
+    flatten<U>(): Option<U>
+
+    /**
+     * Returns the result of applying <code>f</code>empty to this <code>Option</code>'s
+     *  value if the <code>Option</code> is empty;  otherwise, applies
+     *  `f` to the value.
+     *
+     *  @note This is equivalent to <code>Option.map(f).getOrElse(ifEmpty)</code>
+     */
+    fold<U>( ifEmpty: () => U, f: ( value: A ) => U ): U
+
+    /**
+     * Returns true if this option is empty '''or''' the function
+     * <code>test</code> returns true when applied to this <code>Option</code>'s value.
+     *
+     */
+    forAll( test: ( value: A ) => boolean ): boolean
+
+    /**
+     *  Apply the given function <code>f</code> to the <code>Option</code>'s value,
+     *  if it is nonempty. Otherwise, do nothing.
+     *
+     *  @see map
+     *  @see flatMap
+     */
+    forEach<U>( f: ( value: A ) => U ): void
+
+    /**
      * Returns the Option value or throws an exception if there is none
      * Identical to run()
      */
     get(): A
-
-    /**
-     * Returns true is the Option is None, false otherwise
-     */
-    isEmpty(): boolean
 
     /**
      * Returns the <code>Option</code>'s value if the option is nonempty, otherwise
@@ -39,6 +112,11 @@ export interface Option<A> extends Seq<A> {
     getOrUndefined(): A
 
     /**
+     * Returns true is the Option is None, false otherwise
+     */
+    isEmpty(): boolean
+
+    /**
      * Returns a <code>Some</code> containing the result of applying <code>f</code> to this <code>Option</code>'s
      * value if this  <code>Option</code> is nonempty.
      * Otherwise return  <code>None</code>.
@@ -49,88 +127,16 @@ export interface Option<A> extends Seq<A> {
     map<U>( f: ( value: A ) => U ): Option<U>
 
     /**
-     * Returns the result of applying <code>f</code>empty to this <code>Option</code>'s
-     *  value if the <code>Option</code> is empty;  otherwise, applies
-     *  `f` to the value.
-     *
-     *  @note This is equivalent to <code>Option.map(f).getOrElse(ifEmpty)</code>
-     */
-    fold<U>( ifEmpty: () => U, f: ( value: A ) => U ): U
-
-    /**
-     * Returns this <code>Option</code> if it is nonempty '''and''' applying the function <code>test</code> to
-     * this <code>Option</code>'s value returns true. Otherwise, return <code>None</code>.
-     */
-    filter( f: ( value: A ) => boolean ): Option<A>
-
-    /**
-     * Flattens two layers of <code>Option</code> into one
-     * More precisely flattens an Option<Iterable<A>> into an Option<A>
-     */
-    flatten<U>(): Option<U>
-
-    /**
-     * Returns the result of applying <code>f</code> to this <code>Option</code>'s value if
-     * this <code>Option</code> is nonempty.
-     * Returns <code>None</code> if this <code>Option</code> is empty.
-     * Slightly different from `map` in that <code>f</code> is expected to
-     * return an <code>Option</code> (which could be <code>None</code>).
-     *
-     * @note: flatMap '''will''' run the Option
-     *
-     *  @see map
-     *  @see forEach
-     */
-    flatMap<U>( f: ( value: A ) => Option<U> ): Option<U>
-
-    /**
-     * Returns this <code>Option</code> if it is nonempty '''and''' applying the function <code>test</code> to
-     * this <code>Option</code>'s value returns false. Otherwise, return <code>None</code>.
-     */
-    filterNot( test: ( value: A ) => boolean ): Option<A>
-
-    /**
-     * Returns true if this option is nonempty '''and''' the function
-     * <code>test</code> returns true when applied to this <code>Option</code>'s value.
-     * Otherwise, returns false.
-     */
-    exists( test: ( value: A ) => boolean ): boolean
-
-    /**
-     * Returns true if this option is empty '''or''' the function
-     * <code>test</code> returns true when applied to this <code>Option</code>'s value.
-     *
-     */
-    forAll( test: ( value: A ) => boolean ): boolean
-
-    /**
-     *  Apply the given function <code>f</code> to the <code>Option</code>'s value,
-     *  if it is nonempty. Otherwise, do nothing.
-     *
-     *  @see map
-     *  @see flatMap
-     */
-    forEach<U>( f: ( value: A ) => U ): void
-
-    /**
-     * Returns a <code>Some</code> containing the result of
-     * applying <code>someFn</code> to this <code>Option</code>'s contained
-     * value, '''if''' this option is
-     * nonempty '''and''' <code>someFn</code> is defined
-     * Returns <code>None</code> otherwise.
-     */
-    collect<U>( partialFunction: {someFn?: ( value: A ) => U} ): Option<U>
-
-    /**
      * Returns this <code>Option</code> if it is nonempty,
      *  otherwise return the result of evaluating `alternative`.
      */
     orElse( alternative: () => Option<A> ): Option<A>
 
     /**
-     * Returns true is these two options are equal
+     * Convert this Option to a Promise
+     * so that it can be chained using await
      */
-    equals( option: Option<A> ): boolean
+    toPromise: Promise<A>
 }
 
 

@@ -301,7 +301,6 @@ describe( 'Seq', function () {
         deepEqual( aseq( 3 ).flatMap( f ).toArray(), f( 3 ).toArray(), "1st Monad Law" )
         deepEqual( aseq( 1, 2, 3 ).flatMap( aseq ).toArray(), aseq( 1, 2, 3 ).toArray(), "2nd Monad Law" )
         deepEqual( aseq( 1, 2, 3 ).flatMap( ( x ) => f( x ).flatMap( g ) ).toArray(), aseq( 1, 2, 3 ).flatMap( f ).flatMap( g ).toArray(), "3rd Monad Law" )
-
     } ) )
 
 

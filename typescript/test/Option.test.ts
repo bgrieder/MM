@@ -11,7 +11,7 @@ import {list} from '../impl/ListImpl'
 
 const checkFail = TestsSetup.checkFail;
 
-const deepEqual: ( act: any, exp: any, msg?: string ) =>void = chai.assert.deepEqual;
+const deepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.deepEqual;
 // let notDeepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.notDeepEqual;
 const ok: ( val: any, msg?: string ) => void = chai.assert.ok;
 
@@ -176,6 +176,30 @@ describe( 'Option', function () {
         deepEqual( some( list( 1, 2, 2 ) ).flatten().get(), 1, "Some List of vals should be flattened to a a Some of the first val of the List" )
     } ) )
 
+
+    it( 'should be chainable with async', async () => {
+
+        let b: number = 0
+        try {
+            await some( "Should pass" ).toPromise
+            b = await some( 1 ).toPromise
+        }
+        catch ( e ) {
+            /* ignore */
+        }
+        deepEqual( b, 1, "Await some().toPromise should not throw" )
+
+        b = 0
+        try {
+            await none().toPromise
+            b = await some( 1 ).toPromise
+        }
+        catch ( e ) {
+            /* ignore */
+        }
+        deepEqual( b, 0, "Await none().toPromise should throw" )
+
+    } )
 
 } )
 

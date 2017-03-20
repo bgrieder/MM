@@ -74,16 +74,19 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
         this._isCaching = false
     }
 
-    /**
-     * Builds a new sequence by applying a function to all elements of this sequence.
-     */
-    map<U>( f: ( value: A ) => U ): Seq<U> { return super.map( f ) as Seq<U>}
 
     flatten<U>(): Seq<U> { return super.flatten() as Seq<U> }
 
     flatMap<U>( f: ( value: A ) => Seq<U> ): Seq<U> { return super.flatMap( f ) as Seq<U> }
 
     filter( f: ( value: A ) => boolean ): Seq<A> { return super.filter( f ) as Seq<A> }
+
+    /**
+     * Builds a new sequence with all the elements of this sequence which do not specify a predicate.
+     */
+    filterNot( f: ( value: A ) => boolean ): Seq<A> {
+        return this.filter( ( value: A ) => !f( value ) )
+    }
 
     //
     /**
@@ -93,13 +96,10 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
         return this.length === 0 || ((this.length === -1) && !(this.isForward ? this.fit() : this.bit()).iterate())
     }
 
-
     /**
-     * Builds a new sequence with all the elements of this sequence which do not specify a predicate.
+     * Builds a new sequence by applying a function to all elements of this sequence.
      */
-    filterNot( f: ( value: A ) => boolean ): Seq<A> {
-        return this.filter( ( value: A ) => !f( value ) )
-    }
+    map<U>( f: ( value: A ) => U ): Seq<U> { return super.map( f ) as Seq<U>}
 
 
     /**
@@ -150,7 +150,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
     }
 
 
-    private _takeBuilder( n: number ): [( fit: Iterator<A> ) => Iterator<A>,( bit: Iterator<A> ) => Iterator<A>] {
+    private _takeBuilder( n: number ): [ ( fit: Iterator<A> ) => Iterator<A>, ( bit: Iterator<A> ) => Iterator<A> ] {
 
         const getFIterator = ( it: Iterator<A> ): Iterator<A> => {
             let counter = 0;
@@ -235,7 +235,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
         throw( "getAt: index out of bounds: " + index )
     }
 
-    protected _takeAt( index: number ): [boolean, A] {
+    protected _takeAt( index: number ): [ boolean, A ] {
 
         const it = this.fit();
         let idx = -1;
@@ -445,7 +445,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
     }
 
 
-    private _dropBuilder( n: number ): [( fit: Iterator<A> ) => Iterator<A>,( bit: Iterator<A> ) => Iterator<A>] {
+    private _dropBuilder( n: number ): [ ( fit: Iterator<A> ) => Iterator<A>, ( bit: Iterator<A> ) => Iterator<A> ] {
 
         const getFIterator = ( it: Iterator<A> ): Iterator<A> => {
             let index = -1;
@@ -912,7 +912,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
 
     }
 
-    private _startsEndsWith(): [( thisIt: Iterator<A>, otherIt: Iterator<A> )=>boolean,( thisIt: Iterator<A>, otherIt: Iterator<A> )=>boolean] {
+    private _startsEndsWith(): [ ( thisIt: Iterator<A>, otherIt: Iterator<A> ) => boolean, ( thisIt: Iterator<A>, otherIt: Iterator<A> ) => boolean ] {
 
         const thisEndIt = ( thisIt: Iterator<A>, otherIt: Iterator<A> ): boolean => {
 
@@ -937,7 +937,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
 
             if ( otherHasNext ) {
                 //FIXME: Algorithm needs review
-                throw new Error('Algorithm not implemented for backward iterator')
+                throw new Error( 'Algorithm not implemented for backward iterator' )
                 // const firstVal = otherIt.current();
                 // //find first val in tit
                 // while ( thisIt.iterate() ) {
@@ -967,7 +967,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
      */
     endsWith( it: Iterable<A> ): boolean {
 
-        const [thisEndIt, otherEndIt] = this._startsEndsWith()
+        const [ thisEndIt, otherEndIt ] = this._startsEndsWith()
 
         if ( this.isBackward && it.bit ) {
 
@@ -1102,7 +1102,7 @@ export class SeqImpl<A> extends MonadImpl<A> implements Seq<A> {
 /**
  * Create a Seq from one or two iterators and optionally specify its length
  */
-export function seq<A>( fit?: () => Iterator<A>, bit?: () =>Iterator<A>, length?: number ): Seq<A> {
+export function seq<A>( fit?: () => Iterator<A>, bit?: () => Iterator<A>, length?: number ): Seq<A> {
 
     let hasIt = false;
 
