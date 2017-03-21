@@ -31,14 +31,14 @@ const arrayFrom = <A>( iterator: JSIterator<A> ): Array<A> => {
 
 export class Iterable<A> implements JSIterable<A> {
 
-    static from<A>(value: any, length?: number): Iterable<A> {
+    static from<A>( value: any, length?: number ): Iterable<A> {
         if ( value instanceof Iterable ) {
             return value
         }
         if ( typeof value[ Symbol.iterator ] === 'undefined' ) {
             throw new Error( 'This value cannot be iterated' )
         }
-        return new Iterable<A>(value)
+        return new Iterable<A>( value )
     }
 
     private _value: JSIterable<A>
@@ -52,7 +52,6 @@ export class Iterable<A> implements JSIterable<A> {
         return this._value[ Symbol.iterator ]() as JSIterator<A>
     }
 
-
     build<B>( next: () => { done: boolean, value?: B } ): Iterable<B> {
         const iter: JSIterable<B> = {
             [Symbol.iterator]: () => {
@@ -64,7 +63,6 @@ export class Iterable<A> implements JSIterable<A> {
         return new (this.constructor as any)( iter )
     }
 
-
     toArray(): Array<A> {
         return Array.isArray( this._value ) ?
                this._value as Array<A>
@@ -72,21 +70,31 @@ export class Iterable<A> implements JSIterable<A> {
                arrayFrom( this._value[ Symbol.iterator ]() as JSIterator<A> )//ES6: Array.from<A>(value) or [... value]
     }
 
-
-
-
     /**
      * Creates an iterator by transforming values produced by this iterator with a partial function, dropping those values for which the partial function is not defined.
      */
-    // collect = <B>(filter: (value: A) => boolean) => (mapper: (value: A) => B) : Iterable<B> =>{
-    //     this.file
-    // }
+    collect<B>(filter: (value: A) => boolean): (mapper: (value: A) => B) => Iterable<B> {
+        return (mapper: (value: A) => B) => this.filter(filter).map(mapper)
+    }
+
 
     // collectFirst<B>(pf: PartialFunction<A, B>): Option<B>
     // Finds the first element of the traversable or iterator for which the given partial function is defined, and applies the partial function to it.
-    // contains(elem: Any): Boolean
-    // Tests whether this iterator contains a given value as an element.
 
+    /**
+     * Tests whether this iterator contains a given value as an element.
+     */
+    contains(elem: any): boolean {
+        if ( Array.isArray( this._value ) ) {
+            return this._value.indexOf(elem) !== -1
+        }
+        const it: JSIterator<A> = this[ Symbol.iterator ]()
+        while ( true ) {
+            const n = it.next()
+            if ( n.done ) return false
+            if ( eq(n.value, elem)) return true
+        }
+    }
 
 
     /**
@@ -139,10 +147,37 @@ export class Iterable<A> implements JSIterable<A> {
 
     // exists(p: (A) ⇒ Boolean): Boolean
     // Tests whether a predicate holds for some of the values produced by this iterator.
-    // filter(p: (A) ⇒ Boolean): Iterable<A>
-    // Returns an iterator over all the elements of this iterator that satisfy the predicate p.
+
+    /**
+     * Returns an iterator over all the elements of this iterator that satisfy the predicate p.
+     */
+    filter( filter: ( value: A ) => boolean ): Iterable<A> {
+        const it: JSIterator<A> = this[ Symbol.iterator ]()
+        const next = (): { done: boolean, value?: A } => {
+            const n = it.next()
+            if ( n.done ) {
+                return { done: true }
+            }
+            if (filter(n.value)) {
+                return { done: false, value: n.value }
+            }
+            return next()
+        }
+        return this.build<A>( next )
+    }
+
+    /**
+     * Creates an iterator over all the elements of this iterator which do not satisfy a predicate p.
+     * @param filter
+     */
+    filterNot( filter: ( value: A ) => boolean ): Iterable<A> {
+        return this.filter((value: A) => !filter(value))
+    }
     // filterNot(p: (A) ⇒ Boolean): Iterable<A>
-    // Creates an iterator over all the elements of this iterator which do not satisfy a predicate p.
+    //
+
+
+
     // find(p: (A) ⇒ Boolean): Option<A>
     // Finds the first value produced by the iterator satisfying a predicate, if any.
 
@@ -214,7 +249,7 @@ export class Iterable<A> implements JSIterable<A> {
      */
     get size(): number {
         //is it already known ?
-        if (typeof this._length !== 'undefined') {
+        if ( typeof this._length !== 'undefined' ) {
             return this._length
         }
         if ( Array.isArray( this._value ) ) {
@@ -222,9 +257,9 @@ export class Iterable<A> implements JSIterable<A> {
         }
         let count = 0
         const it: JSIterator<A> = this[ Symbol.iterator ]()
-        while(true) {
-            if (it.next().done) return count
-            count = count +1
+        while ( true ) {
+            if ( it.next().done ) return count
+            count = count + 1
         }
     }
 

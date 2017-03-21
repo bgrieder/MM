@@ -87,17 +87,16 @@ export class Option<A> extends Iterable<A> {
         super( value, 1 )
     }
 
+    collect<B>(filter: (value: A) => boolean): (mapper: (value: A) => B) => Iterable<B> {
+        return (mapper: (value: A) => B) => this.filter(filter).map(mapper)
+    }
+
     concat( that: Iterable<A> ): Option<A> {
         return super.concat( that ) as Option<A>
     }
 
-    collect<U>( partialFunction: { someFn?: (( value: A ) => U) } ): Option<U> {
-        return undefined
-    }
-
-
     filter( f: ( value: A ) => boolean ): Option<A> {
-        return undefined
+        return super.filter( f ) as Option<A>
     }
 
     filterNot( test: ( value: A ) => boolean ): Option<A> {
