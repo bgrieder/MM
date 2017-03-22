@@ -72,9 +72,9 @@ export class Seq<A> implements Iterable<A> {
 
     ///////////////////////////////////////////
 
-    // /:<B>(z: B)(op: (B, A) ⇒ B): B
+    // /:<B>(z: B)(op: (B, A) => B): B
     // Applies a binary operator to a start value and all elements of this traversable or Seq, going left to right.
-    // :\<B>(z: B)(op: (A, B) ⇒ B): B
+    // :\<B>(z: B)(op: (A, B) => B): B
     // Applies a binary operator to all elements of this traversable or Seq and a start value, going right to left.
     // addString(b: StringBuilder): StringBuilder
     // Appends all elements of this traversable or Seq to a string builder.
@@ -82,7 +82,7 @@ export class Seq<A> implements Iterable<A> {
     // Appends all elements of this traversable or Seq to a string builder using a separator string.
     // addString(b: StringBuilder, start: String, sep: String, end: String): StringBuilder
     // Appends all elements of this traversable or Seq to a string builder using start, end, and separator strings.
-    // aggregate<B>(z: ⇒ B)(seqop: (B, A) ⇒ B, combop: (B, B) ⇒ B): B
+    // aggregate<B>(z: => B)(seqop: (B, A) => B, combop: (B, B) => B): B
     // Aggregates the results of applying an operator to subsequent elements.
     // buffered: BufferedIterable<A>
     // Creates a buffered Seq from this Seq.
@@ -95,7 +95,7 @@ export class Seq<A> implements Iterable<A> {
     }
 
 
-    // collectFirst<B>(pf: PartialFunction<A, B>): Option<B>
+    //collectFirst<B>(pf: PartialFunction<A, B>): Option<B>
     // Finds the first element of the traversable or Seq for which the given partial function is defined, and applies the partial function to it.
 
     /**
@@ -148,13 +148,21 @@ export class Seq<A> implements Iterable<A> {
     // <use case> Copies the elements of this traversable or Seq to an array.
     // copyToBuffer<B >: A>(dest: Buffer<B>): Unit
     // Copies all elements of this traversable or Seq to a buffer.
-    // corresponds<B>(that: GenTraversableOnce<B>)(p: (A, B) ⇒ Boolean): Boolean
+    // corresponds<B>(that: GenTraversableOnce<B>)(p: (A, B) => Boolean): Boolean
     // Tests whether every element of this Seq relates to the corresponding element of another collection by satisfying a test predicate.
-    // count(p: (A) ⇒ Boolean): Int
-    // Counts the number of elements in the traversable or Seq which satisfy a predicate.
+
+
+    /**
+     * Counts the number of elements in the traversable or Seq which satisfy a predicate.
+     */
+    count( p: ( value: A ) => boolean ): number {
+        return this.filter(p).size
+    }
+
+
     // drop(n: Int): Iterable<A>
     // Advances this Seq past the first n elements, or the length of the Seq, whichever is smaller.
-    // dropWhile(p: (A) ⇒ Boolean): Iterable<A>
+    // dropWhile(p: (A) => Boolean): Iterable<A>
     // Skips longest Sequence of elements of this Seq which satisfy given predicate p, and returns a Seq of the remaining elements.
     // duplicate: (Iterable<A>, Iterable<A>)
     // Creates two new Seqs that both iterate over the same elements as this Seq (in the same order).
@@ -216,7 +224,7 @@ export class Seq<A> implements Iterable<A> {
     }
 
 
-    //find(p: (value: A) ⇒ boolean): Option<A>
+    //find(p: (value: A) => boolean): Option<A>
     // Finds the first value produced by the Seq satisfying a predicate, if any.
 
 
@@ -264,15 +272,15 @@ export class Seq<A> implements Iterable<A> {
         return this.build( next )
     }
 
-    // fold<A1 >: A>(z: A1)(op: (A1, A1) ⇒ A1): A1
+    // fold<A1 >: A>(z: A1)(op: (A1, A1) => A1): A1
     // Folds the elements of this traversable or Seq using the specified associative binary operator.
-    // foldLeft<B>(z: B)(op: (B, A) ⇒ B): B
+    // foldLeft<B>(z: B)(op: (B, A) => B): B
     // Applies a binary operator to a start value and all elements of this traversable or Seq, going left to right.
-    // foldRight<B>(z: B)(op: (A, B) ⇒ B): B
+    // foldRight<B>(z: B)(op: (A, B) => B): B
     // Applies a binary operator to all elements of this traversable or Seq and a start value, going right to left.
-    // forall(p: (A) ⇒ Boolean): Boolean
+    // forall(p: (A) => Boolean): Boolean
     // Tests whether a predicate holds for all values produced by this Seq.
-    // foreach(f: (A) ⇒ Unit): Unit
+    // foreach(f: (A) => Unit): Unit
     // <use case> Applies a function f to all values produced by this Seq.
     // grouped<B >: A>(size: Int): GroupedIterable<B>
     // Returns a Seq which groups this Seq into fixed size blocks.
@@ -282,9 +290,9 @@ export class Seq<A> implements Iterable<A> {
     // Returns the index of the first occurrence of the specified object in this iterable object after or at some start index.
     // indexOf<B >: A>(elem: B): Int
     // Returns the index of the first occurrence of the specified object in this iterable object.
-    // indexWhere(p: (A) ⇒ Boolean, from: Int): Int
+    // indexWhere(p: (A) => Boolean, from: Int): Int
     // Returns the index of the first produced value satisfying a predicate, or -1, after or at some start index.
-    // indexWhere(p: (A) ⇒ Boolean): Int
+    // indexWhere(p: (A) => Boolean): Int
     // Returns the index of the first produced value satisfying a predicate, or -1.
     // isEmpty: Boolean
     // Tests whether this Seq is empty.
@@ -312,11 +320,11 @@ export class Seq<A> implements Iterable<A> {
 
     // max: A
     // <use case> Finds the largest element.
-    // maxBy<B>(f: (A) ⇒ B): A
+    // maxBy<B>(f: (A) => B): A
     // <use case> Finds the first element which yields the largest value measured by function f.
     // min: A
     // <use case> Finds the smallest element.
-    // minBy<B>(f: (A) ⇒ B): A
+    // minBy<B>(f: (A) => B): A
     // <use case> Finds the first element which yields the smallest value measured by function f.
     // mkString: String
     // Displays all elements of this traversable or Seq in a string.
@@ -328,29 +336,29 @@ export class Seq<A> implements Iterable<A> {
     // Tests whether the traversable or Seq is not empty.
     // padTo(len: Int, elem: A): Iterable<A>
     // <use case> Appends an element value to this Seq until a given target length is reached.
-    // partition(p: (A) ⇒ Boolean): (Iterable<A>, Iterable<A>)
+    // partition(p: (A) => Boolean): (Iterable<A>, Iterable<A>)
     // Partitions this Seq in two Seqs according to a predicate.
     // patch<B >: A>(from: Int, patchElems: Iterable<B>, replaced: Int): Iterable<B>
     // Returns this Seq with patched values.
     // product: A
     // <use case> Multiplies up the elements of this collection.
-    // reduce<A1 >: A>(op: (A1, A1) ⇒ A1): A1
+    // reduce<A1 >: A>(op: (A1, A1) => A1): A1
     // Reduces the elements of this traversable or Seq using the specified associative binary operator.
-    // reduceLeft<B >: A>(op: (B, A) ⇒ B): B
+    // reduceLeft<B >: A>(op: (B, A) => B): B
     // Applies a binary operator to all elements of this traversable or Seq, going left to right.
-    // reduceLeftOption<B >: A>(op: (B, A) ⇒ B): Option<B>
+    // reduceLeftOption<B >: A>(op: (B, A) => B): Option<B>
     // Optionally applies a binary operator to all elements of this traversable or Seq, going left to right.
-    // reduceOption<A1 >: A>(op: (A1, A1) ⇒ A1): Option<A1>
+    // reduceOption<A1 >: A>(op: (A1, A1) => A1): Option<A1>
     // Reduces the elements of this traversable or Seq, if any, using the specified associative binary operator.
-    // reduceRight<B >: A>(op: (A, B) ⇒ B): B
+    // reduceRight<B >: A>(op: (A, B) => B): B
     // Applies a binary operator to all elements of this traversable or Seq, going right to left.
-    // reduceRightOption<B >: A>(op: (A, B) ⇒ B): Option<B>
+    // reduceRightOption<B >: A>(op: (A, B) => B): Option<B>
     // Optionally applies a binary operator to all elements of this traversable or Seq, going right to left.
     // sameElements(that: Iterable<_>): Boolean
     // Tests if another Seq produces the same values as this one.
-    // scanLeft<B>(z: B)(op: (B, A) ⇒ B): Iterable<B>
+    // scanLeft<B>(z: B)(op: (B, A) => B): Iterable<B>
     // Produces a collection containing cumulative results of applying the operator going left to right.
-    // scanRight<B>(z: B)(op: (A, B) ⇒ B): Iterable<B>
+    // scanRight<B>(z: B)(op: (A, B) => B): Iterable<B>
     // Produces a collection containing cumulative results of applying the operator going right to left.
     // Seq: Iterable<A>
     // A version of this collection with all of the operations implemented Sequentially (i.e., in a single-threaded manner).
@@ -378,7 +386,7 @@ export class Seq<A> implements Iterable<A> {
     // Creates a Seq returning an interval of the values produced by this Seq.
     // sliding<B >: A>(size: Int, step: Int = 1): GroupedIterable<B>
     // Returns a Seq which presents a "sliding window" view of another Seq.
-    // span(p: (A) ⇒ Boolean): (Iterable<A>, Iterable<A>)
+    // span(p: (A) => Boolean): (Iterable<A>, Iterable<A>)
     // Splits this Iterable into a prefix/suffix pair according to a predicate.
     // sum: A
     // <use case> Sums up the elements of this collection.
@@ -403,7 +411,7 @@ export class Seq<A> implements Iterable<A> {
         return this.build<A>( next )
     }
 
-    // takeWhile(p: (A) ⇒ Boolean): Iterable<A>
+    // takeWhile(p: (A) => Boolean): Iterable<A>
     // Takes longest prefix of values produced by this Seq that satisfy a predicate.
     // to<Col<_>>: Col<A>
     // <use case> Converts this traversable or Seq into another by copying all elements.
@@ -433,7 +441,7 @@ export class Seq<A> implements Iterable<A> {
     // Converts this traversable or Seq to an unspecified Traversable.
     // toVector: Vector<A>
     // Converts this traversable or Seq to a Vector.
-    // withFilter(p: (A) ⇒ Boolean): Iterable<A>
+    // withFilter(p: (A) => Boolean): Iterable<A>
     // Creates a Seq over all the elements of this Seq that satisfy the predicate p.
     // zip<B>(that: Iterable<B>): Iterable<(A, B)>
     // Creates a Seq formed from this Seq and another Seq by combining corresponding values in pairs.

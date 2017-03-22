@@ -66,6 +66,12 @@ describe( 'Iterable', function () {
         done()
     } )
 
+    it( 'count', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).count( v => v % 2 === 0 ), 5, "count failed" )
+        deepEqual( seq<number>( iter ).count( v => v % 2 === 0 ), 5, "count failed" )
+        done()
+    } )
+
     it( 'equals', ( done: MochaDone ) => {
         const a1 = seq( [ 1, 2, 3 ] )
         deepEqual( a1.equals( seq( [ 1, 2, 3 ] ) ), true, "equals failed" )
