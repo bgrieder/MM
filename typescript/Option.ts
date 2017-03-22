@@ -1,7 +1,7 @@
 /**
  * Created by Bruno Grieder.
  */
-import {Iterable, JSIterator} from './Iterable'
+import {Seq, Iterator} from './Seq'
 
 
 // export interface Option<A> extends Iterable<A> {
@@ -73,7 +73,7 @@ import {Iterable, JSIterator} from './Iterable'
 //
 // }
 
-export class Option<A> extends Iterable<A> {
+export class Option<A> extends Seq<A> {
 
     static from<A>( value: any ): Option<A> {
         const arr = (typeof value === 'undefined' || value === null) ?
@@ -87,11 +87,11 @@ export class Option<A> extends Iterable<A> {
         super( value, 1 )
     }
 
-    collect<B>(filter: (value: A) => boolean): (mapper: (value: A) => B) => Iterable<B> {
+    collect<B>(filter: (value: A) => boolean): (mapper: (value: A) => B) => Seq<B> {
         return (mapper: (value: A) => B) => this.filter(filter).map(mapper)
     }
 
-    concat( that: Iterable<A> ): Option<A> {
+    concat( that: Seq<A> ): Option<A> {
         return super.concat( that ) as Option<A>
     }
 
@@ -112,7 +112,7 @@ export class Option<A> extends Iterable<A> {
     }
 
     orElse( alternative: () => Option<A> ): Option<A> {
-        const it: JSIterator<A> = this[ Symbol.iterator ]()
+        const it: Iterator<A> = this[ Symbol.iterator ]()
         const n = it.next()
         if ( n.done ) {
             return alternative()
@@ -122,7 +122,7 @@ export class Option<A> extends Iterable<A> {
 
 
     getOrElse<U>( elseVal: () => U ): A | U {
-        const it: JSIterator<A> = this[ Symbol.iterator ]()
+        const it: Iterator<A> = this[ Symbol.iterator ]()
         const n = it.next()
         if ( n.done ) {
             return elseVal()
