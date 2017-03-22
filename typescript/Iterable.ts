@@ -70,6 +70,23 @@ export class Iterable<A> implements JSIterable<A> {
                arrayFrom( this._value[ Symbol.iterator ]() as JSIterator<A> )//ES6: Array.from<A>(value) or [... value]
     }
 
+    ///////////////////////////////////////////
+
+    // /:<B>(z: B)(op: (B, A) ⇒ B): B
+    // Applies a binary operator to a start value and all elements of this traversable or iterator, going left to right.
+    // :\<B>(z: B)(op: (A, B) ⇒ B): B
+    // Applies a binary operator to all elements of this traversable or iterator and a start value, going right to left.
+    // addString(b: StringBuilder): StringBuilder
+    // Appends all elements of this traversable or iterator to a string builder.
+    // addString(b: StringBuilder, sep: String): StringBuilder
+    // Appends all elements of this traversable or iterator to a string builder using a separator string.
+    // addString(b: StringBuilder, start: String, sep: String, end: String): StringBuilder
+    // Appends all elements of this traversable or iterator to a string builder using start, end, and separator strings.
+    // aggregate<B>(z: ⇒ B)(seqop: (B, A) ⇒ B, combop: (B, B) ⇒ B): B
+    // Aggregates the results of applying an operator to subsequent elements.
+    // buffered: BufferedIterable<A>
+    // Creates a buffered iterator from this iterator.
+
     /**
      * Creates an iterator by transforming values produced by this iterator with a partial function, dropping those values for which the partial function is not defined.
      */
@@ -95,7 +112,6 @@ export class Iterable<A> implements JSIterable<A> {
             if ( eq(n.value, elem)) return true
         }
     }
-
 
     /**
      * [use case] Concatenates this iterator with another.
@@ -124,6 +140,25 @@ export class Iterable<A> implements JSIterable<A> {
         return this.build( next )
     }
 
+    // copyToArray(xs: Array<A>, start: Int, len: Int): Unit
+    // <use case> Copies selected values produced by this iterator to an array.
+    // copyToArray(xs: Array<A>): Unit
+    // <use case> Copies the elements of this traversable or iterator to an array.
+    // copyToArray(xs: Array<A>, start: Int): Unit
+    // <use case> Copies the elements of this traversable or iterator to an array.
+    // copyToBuffer<B >: A>(dest: Buffer<B>): Unit
+    // Copies all elements of this traversable or iterator to a buffer.
+    // corresponds<B>(that: GenTraversableOnce<B>)(p: (A, B) ⇒ Boolean): Boolean
+    // Tests whether every element of this iterator relates to the corresponding element of another collection by satisfying a test predicate.
+    // count(p: (A) ⇒ Boolean): Int
+    // Counts the number of elements in the traversable or iterator which satisfy a predicate.
+    // drop(n: Int): Iterable<A>
+    // Advances this iterator past the first n elements, or the length of the iterator, whichever is smaller.
+    // dropWhile(p: (A) ⇒ Boolean): Iterable<A>
+    // Skips longest sequence of elements of this iterator which satisfy given predicate p, and returns an iterator of the remaining elements.
+    // duplicate: (Iterable<A>, Iterable<A>)
+    // Creates two new iterators that both iterate over the same elements as this iterator (in the same order).
+
     equals( that: Iterable<A> ): boolean {
 
         const thisIt: JSIterator<A> = this[ Symbol.iterator ]()
@@ -145,8 +180,15 @@ export class Iterable<A> implements JSIterable<A> {
         }
     }
 
-    // exists(p: (A) ⇒ Boolean): Boolean
-    // Tests whether a predicate holds for some of the values produced by this iterator.
+
+
+    /**
+     * Tests whether a predicate holds for some of the values produced by this iterator.
+     * @param p
+     */
+    exists(p: (value: A) => boolean): boolean {
+        return this.filter(p).take(1).size === 1
+    }
 
     /**
      * Returns an iterator over all the elements of this iterator that satisfy the predicate p.
@@ -173,12 +215,9 @@ export class Iterable<A> implements JSIterable<A> {
     filterNot( filter: ( value: A ) => boolean ): Iterable<A> {
         return this.filter((value: A) => !filter(value))
     }
-    // filterNot(p: (A) ⇒ Boolean): Iterable<A>
-    //
 
 
-
-    // find(p: (A) ⇒ Boolean): Option<A>
+    //find(p: (value: A) ⇒ boolean): Option<A>
     // Finds the first value produced by the iterator satisfying a predicate, if any.
 
 
@@ -226,76 +265,6 @@ export class Iterable<A> implements JSIterable<A> {
         return this.build( next )
     }
 
-
-    /**
-     * Creates a new iterator that maps all produced values of this iterator to new values using a transformation function.
-     */
-    map<B>( f: ( value: A, index?: number ) => B ): Iterable<B> {
-        const it: JSIterator<A> = this[ Symbol.iterator ]()
-        let i = -1
-        const next = (): { done: boolean, value?: B } => {
-            const n = it.next()
-            if ( n.done ) {
-                return { done: true }
-            }
-            i = i + 1
-            return { done: false, value: f( n.value, i ) }
-        }
-        return this.build<B>( next )
-    }
-
-    /**
-     * The size of this traversable or iterator.
-     */
-    get size(): number {
-        //is it already known ?
-        if ( typeof this._length !== 'undefined' ) {
-            return this._length
-        }
-        if ( Array.isArray( this._value ) ) {
-            return this._value.length
-        }
-        let count = 0
-        const it: JSIterator<A> = this[ Symbol.iterator ]()
-        while ( true ) {
-            if ( it.next().done ) return count
-            count = count + 1
-        }
-    }
-
-
-    // /:<B>(z: B)(op: (B, A) ⇒ B): B
-    // Applies a binary operator to a start value and all elements of this traversable or iterator, going left to right.
-    // :\<B>(z: B)(op: (A, B) ⇒ B): B
-    // Applies a binary operator to all elements of this traversable or iterator and a start value, going right to left.
-    // addString(b: StringBuilder): StringBuilder
-    // Appends all elements of this traversable or iterator to a string builder.
-    // addString(b: StringBuilder, sep: String): StringBuilder
-    // Appends all elements of this traversable or iterator to a string builder using a separator string.
-    // addString(b: StringBuilder, start: String, sep: String, end: String): StringBuilder
-    // Appends all elements of this traversable or iterator to a string builder using start, end, and separator strings.
-    // aggregate<B>(z: ⇒ B)(seqop: (B, A) ⇒ B, combop: (B, B) ⇒ B): B
-    // Aggregates the results of applying an operator to subsequent elements.
-    // buffered: BufferedIterable<A>
-    // Creates a buffered iterator from this iterator.
-    // copyToArray(xs: Array<A>, start: Int, len: Int): Unit
-    // <use case> Copies selected values produced by this iterator to an array.
-    // copyToArray(xs: Array<A>): Unit
-    // <use case> Copies the elements of this traversable or iterator to an array.
-    // copyToArray(xs: Array<A>, start: Int): Unit
-    // <use case> Copies the elements of this traversable or iterator to an array.
-    // copyToBuffer<B >: A>(dest: Buffer<B>): Unit
-    // Copies all elements of this traversable or iterator to a buffer.
-    // corresponds<B>(that: GenTraversableOnce<B>)(p: (A, B) ⇒ Boolean): Boolean
-    // Tests whether every element of this iterator relates to the corresponding element of another collection by satisfying a test predicate.
-    // count(p: (A) ⇒ Boolean): Int
-    // Counts the number of elements in the traversable or iterator which satisfy a predicate.
-    // drop(n: Int): Iterable<A>
-    // Advances this iterator past the first n elements, or the length of the iterator, whichever is smaller.
-    // dropWhile(p: (A) ⇒ Boolean): Iterable<A>
-    // Skips longest sequence of elements of this iterator which satisfy given predicate p, and returns an iterator of the remaining elements.
-    // duplicate: (Iterable<A>, Iterable<A>)
-    // Creates two new iterators that both iterate over the same elements as this iterator (in the same order).
     // fold<A1 >: A>(z: A1)(op: (A1, A1) ⇒ A1): A1
     // Folds the elements of this traversable or iterator using the specified associative binary operator.
     // foldLeft<B>(z: B)(op: (B, A) ⇒ B): B
@@ -324,6 +293,24 @@ export class Iterable<A> implements JSIterable<A> {
     // Tests whether this Iterable can be repeatedly traversed.
     // length: Int
     // Returns the number of elements in this iterator.
+
+    /**
+     * Creates a new iterator that maps all produced values of this iterator to new values using a transformation function.
+     */
+    map<B>( f: ( value: A, index?: number ) => B ): Iterable<B> {
+        const it: JSIterator<A> = this[ Symbol.iterator ]()
+        let i = -1
+        const next = (): { done: boolean, value?: B } => {
+            const n = it.next()
+            if ( n.done ) {
+                return { done: true }
+            }
+            i = i + 1
+            return { done: false, value: f( n.value, i ) }
+        }
+        return this.build<B>( next )
+    }
+
     // max: A
     // <use case> Finds the largest element.
     // maxBy<B>(f: (A) ⇒ B): A
@@ -368,6 +355,26 @@ export class Iterable<A> implements JSIterable<A> {
     // Produces a collection containing cumulative results of applying the operator going right to left.
     // seq: Iterable<A>
     // A version of this collection with all of the operations implemented sequentially (i.e., in a single-threaded manner).
+
+    /**
+     * The size of this traversable or iterator.
+     */
+    get size(): number {
+        //is it already known ?
+        if ( typeof this._length !== 'undefined' ) {
+            return this._length
+        }
+        if ( Array.isArray( this._value ) ) {
+            return this._value.length
+        }
+        let count = 0
+        const it: JSIterator<A> = this[ Symbol.iterator ]()
+        while ( true ) {
+            if ( it.next().done ) return count
+            count = count + 1
+        }
+    }
+
     // slice(from: Int, until: Int): Iterable<A>
     // Creates an iterator returning an interval of the values produced by this iterator.
     // sliding<B >: A>(size: Int, step: Int = 1): GroupedIterable<B>
@@ -376,8 +383,27 @@ export class Iterable<A> implements JSIterable<A> {
     // Splits this Iterable into a prefix/suffix pair according to a predicate.
     // sum: A
     // <use case> Sums up the elements of this collection.
-    // take(n: Int): Iterable<A>
-    // Selects first n values of this iterator.
+
+    /**
+     * Selects first n values of this iterator.
+     */
+    take(n: number): Iterable<A> {
+        const it: JSIterator<A> = this[ Symbol.iterator ]()
+        let i = 0
+        const next = (): { done: boolean, value?: A } => {
+            if (i === n) {
+                return {done: true}
+            }
+            const next = it.next()
+            if ( next.done ) {
+                return {done: true}
+            }
+            i = i + 1
+            return { done: false, value: next.value  }
+        }
+        return this.build<A>( next )
+    }
+
     // takeWhile(p: (A) ⇒ Boolean): Iterable<A>
     // Takes longest prefix of values produced by this iterator that satisfy a predicate.
     // to<Col<_>>: Col<A>
@@ -423,60 +449,4 @@ export function iterable<A>( jsIterable: any, length?: number ): Iterable<A> {
     return Iterable.from<A>( jsIterable, length )
 }
 
-
-// export interface Product {
-//
-//     /**
-//      * A method that should be called from every well-designed equals method that is open to be overridden in a subclass.
-//      */
-//     canEqual( that: any ): boolean
-//
-//     /**
-//      * The size of this product.
-//      */
-//     productArity: number
-//
-//     /**
-//      * The nth element of this product, 0-based.
-//      */
-//     productElement( n: number ): any
-//
-//     /**
-//      * An iterator over all the elements of this product.
-//      */
-//     productIterator: Iterator<any>
-//
-//     /**
-//      * A string used in the toString methods of derived classes.
-//      */
-//     productPrefix: string
-// }
-
-//
-// export const Produceable = <T extends Constructor<{}>>( Base: T ) =>
-//     class extends Base implements Product {
-//
-//         canEqual( that: any ): boolean {
-//             throw new Error( 'Method not implemented.' );
-//         }
-//
-//         productArity: number;
-//
-//         productElement( n: number ) {
-//             throw new Error( 'Method not implemented.' );
-//         }
-//
-//         productIterator: Iterator<any>;
-//         productPrefix: string;
-//     } as Constructor<Product> & T
-
-
-// export class A {
-//     getValue(): string { return "blah" }
-// }
-//
-// const B = Produceable( A )
-//
-// const b = new B()
-// b.getValue()
 
