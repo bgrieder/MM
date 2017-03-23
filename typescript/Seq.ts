@@ -416,32 +416,32 @@ export class Seq<A> implements Iterable<A> {
     // <use case> Finds the first element which yields the smallest value measured by function f.
 
     /**
-     * Displays all elements of this Seq in a string.
+     * Displays all elements of this Seq in a string using an optional separator string.
      */
-    mkString(): string;
-
-    /**
-     * Displays all elements of this Seq in a string using a separator string.
-     */
-    mkString( sep: string ): string;
+    mkString( sep?: string ): string;
 
     /**
      * Displays all elements of this Seq in a string using start, end, and separator strings.
      */
-    mkString( start?: string, sep?: string, end?: string ): string {
-        if ( typeof start === 'undefined' ) {
-            start = ''
-            sep = ','
+    mkString( start?: string, sep?: string, end?: string ): string;
+
+    /**
+     * Displays all elements of this Seq in a string using start, end, and separator strings.
+     */
+    mkString( startOrSep?: string, sep?: string, end?: string ): string {
+        if ( typeof startOrSep === 'undefined' ) {
+            startOrSep = ''
+            sep = ''
             end = ''
         }
         else if ( typeof sep === 'undefined' ) {
-            //start is actually sep
-            sep = start
-            start = ''
+            //startOrSep is actually sep
+            sep = startOrSep
+            startOrSep = ''
             end = ''
         }
         return this.foldLeft( '' )( ( s, v, i ) => {
-                return s + (i == 0 ? start : sep) + v.toString()
+                return s + (i == 0 ? startOrSep : sep) + v.toString()
             } ) + end
     }
 

@@ -213,8 +213,13 @@ describe( 'Seq', function () {
     } )
 
     it( 'mkString', ( done: MochaDone ) => {
-        deepEqual( seq<number>( arr ).mkString( ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
-        deepEqual( seq<number>( iter ).mkString( ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
+        deepEqual( seq<number>( arr ).mkString(), "0123456789", "mkString failed" )
+        deepEqual( seq<number>( iter ).mkString(), "0123456789", "mkString failed" )
+        deepEqual( seq<number>( arr ).mkString( ',' ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
+        deepEqual( seq<number>( iter ).mkString( ',' ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
+        deepEqual( seq<number>( arr ).mkString( ',' ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
+        deepEqual( seq<number>( iter ).mkString( '[', ',', ']' ), "[0,1,2,3,4,5,6,7,8,9]", "mkString failed" )
+        deepEqual( seq<number>( arr ).mkString( '[', ',', ']' ), "[0,1,2,3,4,5,6,7,8,9]", "mkString failed" )
         done()
     } )
 
