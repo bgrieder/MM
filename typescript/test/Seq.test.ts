@@ -4,7 +4,7 @@
 
 require( 'source-map-support' ).install()
 import chai = require('chai')
-import {Iterable, Iterator, seq} from '../Seq'
+import {Iterable, Iterator, list, seq} from '../Seq'
 
 
 const deepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.deepEqual;
@@ -212,6 +212,12 @@ describe( 'Seq', function () {
         done()
     } )
 
+    it( 'mkString', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).mkString( ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
+        deepEqual( seq<number>( iter ).mkString( ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
+        done()
+    } )
+
     it( 'should be a monad', ( done: MochaDone ) => {
         //Monad Laws
         const f = ( x: number ) => seq( [ x * x ] );
@@ -248,6 +254,11 @@ describe( 'Seq', function () {
         deepEqual( count, 5, "lazy failed" )
         deepEqual( head, 4, "lazy failed" )
 
+        done()
+    } )
+
+    it( 'list is a seq', ( done: MochaDone ) => {
+        deepEqual( list( 1, 2, 3 ).toArray, [ 1, 2, 3 ], "list as seq failed" )
         done()
     } )
 
