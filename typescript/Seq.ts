@@ -14,11 +14,14 @@ export interface Iterator<A> {
 
 export interface Iterable<A> {
     [Symbol.iterator](): Iterator<A>
+    length?: number
+    reverseIterator?: () => Iterator<A>
 }
 
 
 const arrayFrom = <A>( iterator: Iterator<A> ): Array<A> => {
-    let a: Array<A> = []
+    //initializing with the len does not seem to add a benefit: http://stackoverflow.com/questions/18947892/creating-range-in-javascript-strange-syntax
+    let a: A[] = []
     while ( true ) {
         const n = iterator.next()
         if ( n.done ) {
@@ -31,18 +34,24 @@ const arrayFrom = <A>( iterator: Iterator<A> ): Array<A> => {
 
 export class Seq<A> implements Iterable<A> {
 
-    static from<A>( value: any, length?: number ): Seq<A> {
+    static from<A>( ...vals: any[] ): Seq<A> {
+        if ( vals.length === 0 ) {
+            return new Seq<A>( [] )
+        }
+        if ( vals.length > 1 ) {
+            return new Seq<A>( vals )
+        }
+        const value = vals[ 0 ]
         if ( value instanceof Seq ) {
             return value
         }
         if ( typeof value[ Symbol.iterator ] === 'undefined' ) {
-            throw new Error( 'This value cannot be iterated' )
+            return new Seq<A>( [ value ] )
         }
         return new Seq<A>( value )
     }
 
     private _value: Iterable<A>
-    private _length: number
 
     protected constructor( value: any, length?: number ) {
         this._value = value
@@ -83,6 +92,32 @@ export class Seq<A> implements Iterable<A> {
 
     // aggregate<B>(z: => B)(seqop: (B, A) => B, combop: (B, B) => B): B
     // Aggregates the results of applying an operator to subsequent elements.
+
+    /**
+     * Returns the element at index.
+     * The first element is at index 0
+     * O(1) if the underlying iterable is an array or a string, O(n) otherwise
+     */
+    at( index: number ): A {
+        if (index < 0) {
+            throw new Error('Invalid index: '+index)
+        }
+        if ( Array.isArray( this._value ) ) {
+            return this._value[ index ]
+        }
+        if ( typeof this._value === 'string' ) {
+            return (this._value as string).charAt( index ) as any as A
+        }
+        const it: Iterator<A> = this[ Symbol.iterator ]()
+        let i = 0
+        while ( true ) {
+            const n = it.next()
+            if ( n.done ) throw new Error( "No such Element" )
+            if ( i === index ) {
+                return n.value
+            }
+        }
+    }
 
     // buffered: BufferedSeq<A>
     // Creates a buffered Seq from this Seq.
@@ -182,6 +217,10 @@ export class Seq<A> implements Iterable<A> {
     // duplicate: (Seq<A>, Seq<A>)
     // Creates two new Seqs that both iterate over the same elements as this Seq (in the same order).
 
+    /**
+     * Test whether these two Seqs are equal by testing equality on all elements
+     * Equality on elements is tested first by using an `equals` method if it exists, or `===` otherwise
+     */
     equals( that: Seq<A> ): boolean {
 
         const thisIt: Iterator<A> = this[ Symbol.iterator ]()
@@ -328,16 +367,16 @@ export class Seq<A> implements Iterable<A> {
      * Tests whether this Iterable has a known size.
      */
     get hasDefiniteSize(): boolean {
-        return typeof this._length !== 'undefined' || Array.isArray( this._value )
+        return typeof this._value.length !== 'undefined' || Array.isArray( this._value )
     }
 
     /**
-     * Selects the firs element of this Seq
+     * Selects the first element of this Seq
      */
     get head(): A {
         const it: Iterator<A> = this[ Symbol.iterator ]()
         const n = it.next()
-        if ( n.done ) throw "No head: no more elements"
+        if ( n.done ) throw new Error( "No such element" )
         return n.value
     }
 
@@ -481,10 +520,17 @@ export class Seq<A> implements Iterable<A> {
 
     /**
      * Returns a new Seq with the elements in reverse order
-     * Reversing the sequence will create an in-memory array
+     * Reversing the sequence will create an in-memory array unless a reverseIterator is provided
      */
     get reverse(): Seq<A> {
-        return new (this.constructor as any)( this.toArray.reverse() )
+        if ( typeof this._value.reverseIterator === 'undefined' ) {
+            return new (this.constructor as any)( this.toArray.reverse() )
+        }
+        return new Seq<A>( {
+                               [Symbol.iterator]: this._value.reverseIterator,
+                               length:            this._value.length,
+                               reverseIterator:   this._value[ Symbol.iterator ]
+                           } )
     }
 
     // sameElements(that: Iterable<_>): Boolean
@@ -497,14 +543,11 @@ export class Seq<A> implements Iterable<A> {
     // Produces a collection containing cumulative results of applying the operator going right to left.
 
     /**
-     * The size of this traversable or Seq.
+     * The size of this Seq.
      */
     get size(): number {
         //is it already known ?
-        if ( typeof this._length !== 'undefined' ) {
-            return this._length
-        }
-        if ( Array.isArray( this._value ) ) {
+        if ( typeof this._value.length !== 'undefined' ) {
             return this._value.length
         }
         let count = 0
@@ -519,7 +562,10 @@ export class Seq<A> implements Iterable<A> {
      * Creates a Seq returning an interval of the values produced by this Seq.
      */
     slice( from: number, until: number ): Seq<A> {
-        return this.drop( from ).take( until - from )
+        return Array.isArray( this._value ) ?
+               new (this.constructor as any)( this._value.slice( from, until ) )
+            :
+               this.drop( from ).take( until - from )
     }
 
     // sliding<B >: A>(size: number, step: number = 1): GroupedIterable<B>
@@ -531,9 +577,17 @@ export class Seq<A> implements Iterable<A> {
     /**
      * Sums up the elements of this collection.
      */
-    // get sum(): A {
-    //
-    // }
+    get sum(): A {
+        const first = this.head
+        return this.tail.foldLeft( first )( ( s: any, v ) => s + v )  //any is to trick the compiler
+    }
+
+    /**
+     * Selects all elements but the first
+     */
+    get tail(): Seq<A> {
+        return this.drop( 1 )
+    }
 
     /**
      * Selects first n values of this Seq.
@@ -573,39 +627,51 @@ export class Seq<A> implements Iterable<A> {
 
     // toBuffer<B >: A>: Buffer<B>
     // Uses the contents of this Seq to create a new mutable buffer.
+
     // toIndexedSeq: immutable.IndexedSeq<A>
     // Converts this Seq to an indexed Sequence.
+
     // toList: List<A>
     // Converts this Seq to a list.
+
     // toMap<T, U>: Map<T, U>
     // <use case> Converts this Seq to a map.
+
     // toSet<B >: A>: immutable.Set<B>
     // Converts this Seq to a set.
+
     // toStream: immutable.Stream<A>
     // Converts this Seq to a stream.
-    // toString(): String
-    // Converts this Seq to a string.
+
+    /**
+     * Converts this Seq to a string.
+     */
+    get toString(): string {
+        return this.mkString()
+    }
+
     // toTraversable: Traversable<A>
     // Converts this Seq to an unspecified Traversable.
+
     // toVector: Vector<A>
     // Converts this Seq to a Vector.
 
     // withFilter(p: (A) => Boolean): Seq<A>
     // Creates a Seq over all the elements of this Seq that satisfy the predicate p.
+
     // zip<B>(that: Iterable<B>): Iterable<(A, B)>
     // Creates a Seq formed from this Seq and another Seq by combining corresponding values in pairs.
+
     // zipAll<B>(that: Iterable<B>, thisElem: A, thatElem: B): Iterable<(A, B)>
     // <use case> Creates a Seq formed from this Seq and another Seq by combining corresponding elements in pairs.
+
     // zipWithIndex: Iterable<(A, number)>
     // Creates a Seq that pairs each element produced by this Seq with its index, counting from 0.
 
 }
 
-export function seq<A>( jsIterable: any, length?: number ): Seq<A> {
-    return Seq.from<A>( jsIterable, length )
+export function seq<A>( ...vals: any[] ): Seq<A> {
+    return Seq.from<A>( ...vals )
 }
 
 
-export function list<A>( ...vals: A[] ): Seq<A> {
-    return Seq.from<A>( vals )
-}

@@ -4,7 +4,7 @@
 
 require( 'source-map-support' ).install()
 import chai = require('chai')
-import {Iterable, Iterator, list, seq} from '../Seq'
+import {Iterable, Iterator, seq} from '../Seq'
 
 
 const deepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.deepEqual;
@@ -160,6 +160,13 @@ describe( 'Seq', function () {
         done()
     } )
 
+    it( 'head', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).head, 0, "head failed" )
+        deepEqual( seq<number>( iter ).head, 0, "head failed" )
+        done()
+    } )
+
+
     it( 'indexOf', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).indexOf( 2 ), 2, "indexOf failed" )
         deepEqual( seq<number>( arr ).indexOf( 2, 3 ), -1, "indexOf failed" )
@@ -188,6 +195,17 @@ describe( 'Seq', function () {
         done()
     } )
 
+    it( 'mkString', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).mkString(), "0123456789", "mkString failed" )
+        deepEqual( seq<number>( iter ).mkString(), "0123456789", "mkString failed" )
+        deepEqual( seq<number>( arr ).mkString( ',' ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
+        deepEqual( seq<number>( iter ).mkString( ',' ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
+        deepEqual( seq<number>( arr ).mkString( ',' ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
+        deepEqual( seq<number>( iter ).mkString( '[', ',', ']' ), "[0,1,2,3,4,5,6,7,8,9]", "mkString failed" )
+        deepEqual( seq<number>( arr ).mkString( '[', ',', ']' ), "[0,1,2,3,4,5,6,7,8,9]", "mkString failed" )
+        done()
+    } )
+
     it( 'reverse', ( done: MochaDone ) => {
         deepEqual( seq<number>( iter ).reverse.toArray, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ].reverse(), "reverse failed" )
         deepEqual( seq<number>( arr ).reverse.toArray, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ].reverse(), "reverse failed" )
@@ -206,20 +224,28 @@ describe( 'Seq', function () {
         done()
     } )
 
+    it( 'sum', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).sum, 45, "sum failed" )
+        deepEqual( seq<number>( iter ).sum, 45, "sum failed" )
+        deepEqual( seq<string>( "abcdef" ).sum, "abcdef", "sum failed" )
+        done()
+    } )
+
+    it( 'tail', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).tail.toArray, [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "tail failed" )
+        deepEqual( seq<number>( iter ).tail.toArray, [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "tail failed" )
+        done()
+    } )
+
     it( 'take', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).take( 3 ).toArray, [ 0, 1, 2 ], "take failed" )
         deepEqual( seq<number>( iter ).take( 3 ).toArray, [ 0, 1, 2 ], "take failed" )
         done()
     } )
 
-    it( 'mkString', ( done: MochaDone ) => {
-        deepEqual( seq<number>( arr ).mkString(), "0123456789", "mkString failed" )
-        deepEqual( seq<number>( iter ).mkString(), "0123456789", "mkString failed" )
-        deepEqual( seq<number>( arr ).mkString( ',' ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
-        deepEqual( seq<number>( iter ).mkString( ',' ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
-        deepEqual( seq<number>( arr ).mkString( ',' ), "0,1,2,3,4,5,6,7,8,9", "mkString failed" )
-        deepEqual( seq<number>( iter ).mkString( '[', ',', ']' ), "[0,1,2,3,4,5,6,7,8,9]", "mkString failed" )
-        deepEqual( seq<number>( arr ).mkString( '[', ',', ']' ), "[0,1,2,3,4,5,6,7,8,9]", "mkString failed" )
+    it( 'toString', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).toString, "0123456789", "toString failed" )
+        deepEqual( seq<number>( iter ).toString, "0123456789", "toString failed" )
         done()
     } )
 
@@ -262,10 +288,16 @@ describe( 'Seq', function () {
         done()
     } )
 
-    it( 'list is a seq', ( done: MochaDone ) => {
-        deepEqual( list( 1, 2, 3 ).toArray, [ 1, 2, 3 ], "list as seq failed" )
+    it( 'should build from a list', ( done: MochaDone ) => {
+        deepEqual( seq( 1, 2, 3 ).toArray, [ 1, 2, 3 ], "seq from list failed" )
         done()
     } )
+
+    it( 'should build from a string', ( done: MochaDone ) => {
+        deepEqual( seq( "abcd" ).toArray, [ 'a','b','c','d' ], "seq from string failed" )
+        done()
+    } )
+
 
 } )
 
