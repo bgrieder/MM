@@ -96,11 +96,11 @@ export class Seq<A> implements Iterable<A> {
     /**
      * Returns the element at index.
      * The first element is at index 0
-     * O(1) if the underlying iterable is an array or a string, O(n) otherwise
+     * O(1) if the underlying iterable is an IndexedSeq, O(n) otherwise
      */
     at( index: number ): A {
-        if (index < 0) {
-            throw new Error('Invalid index: '+index)
+        if ( index < 0 ) {
+            throw new Error( 'Invalid index: ' + index )
         }
         if ( Array.isArray( this._value ) ) {
             return this._value[ index ]
@@ -274,8 +274,16 @@ export class Seq<A> implements Iterable<A> {
         return this.filter( ( value: A ) => !filter( value ) )
     }
 
-    //find(p: (value: A) => boolean): Option<A>
-    // Finds the first value produced by the Seq satisfying a predicate, if any.
+    // /**
+    //  * Finds the first value produced by the Seq satisfying a predicate, if any.
+    //  */
+    // find(p: (value: A) => boolean): Option<A> {
+    //     const it: Iterator<A> = this[ Symbol.iterator ]()
+    //     for ( let n = it.next(); !n.done; n = it.next() ) {
+    //         if (p( n.value )) return some<A>(n.value)
+    //     }
+    //     return none()
+    // }
 
     /**
      * Creates a new Seq by applying a function to all values produced by this Seq and concatenating the results.
@@ -415,6 +423,14 @@ export class Seq<A> implements Iterable<A> {
         return this.size === 0
     }
 
+    /**
+     * Tests whether this Seq is an Indexed Seq
+     * i.e. its elements can be accessed using an index
+     */
+    get isIndexedSeq(): boolean {
+        return Array.isArray( this._value ) || typeof this._value === 'string'
+    }
+
     // isTraversableAgain: Boolean
     // Tests whether this Iterable can be repeatedly traversed.
 
@@ -520,17 +536,30 @@ export class Seq<A> implements Iterable<A> {
 
     /**
      * Returns a new Seq with the elements in reverse order
-     * Reversing the sequence will create an in-memory array unless a reverseIterator is provided
+     * If a reverse iterator is available, it will be used otherwise:
+     *      - reversing an indexed seq will return a linear (non indexed Seq).
+     *      - reversing a linear Seq will create an indexed Seq by by loading its content into an im-memory array
      */
     get reverse(): Seq<A> {
-        if ( typeof this._value.reverseIterator === 'undefined' ) {
-            return new (this.constructor as any)( this.toArray.reverse() )
+        if ( typeof this._value.reverseIterator !== 'undefined' ) {
+            return new Seq<A>( {
+                                   [Symbol.iterator]: this._value.reverseIterator,
+                                   length:            this._value.length,
+                                   reverseIterator:   this._value[ Symbol.iterator ]
+                               } )
         }
-        return new Seq<A>( {
-                               [Symbol.iterator]: this._value.reverseIterator,
-                               length:            this._value.length,
-                               reverseIterator:   this._value[ Symbol.iterator ]
-                           } )
+        if ( this.isIndexedSeq ) {
+            let index = this.length
+            const next = (): { done: boolean, value?: A } => {
+                if ( index <= 0 ) {
+                    return { done: true }
+                }
+                index = index - 1
+                return { done: false, value: this.at( index ) }
+            }
+            return this.build<A>( next )
+        }
+        return new Seq<A>(this.toArray.reverse())
     }
 
     // sameElements(that: Iterable<_>): Boolean
@@ -628,8 +657,15 @@ export class Seq<A> implements Iterable<A> {
     // toBuffer<B >: A>: Buffer<B>
     // Uses the contents of this Seq to create a new mutable buffer.
 
-    // toIndexedSeq: immutable.IndexedSeq<A>
-    // Converts this Seq to an indexed Sequence.
+    /**
+     * Converts this Seq to an indexed Seq is it not already one
+     * by creating an in memory array with the content
+     */
+    get toIndexedSeq(): Seq<A> {
+        if (this.isIndexedSeq) return this
+        return new Seq<A>(this.toArray)
+    }
+    //
 
     // toList: List<A>
     // Converts this Seq to a list.

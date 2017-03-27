@@ -125,6 +125,14 @@ describe( 'Seq', function () {
         done()
     } )
 
+    // it( 'find', ( done: MochaDone ) => {
+    //     deepEqual( seq<number>( arr ).find( x => x === 3 ), true , "find failed" )
+    //     deepEqual( seq<number>( arr ).find( x => x === 13 ), true , "find failed" )
+    //     deepEqual( seq<number>( iter ).find( x => x === 3 ), true , "find failed" )
+    //     deepEqual( seq<number>( iter ).find( x => x === 13 ), true , "find failed" )
+    //     done()
+    // } )
+
     it( 'foldLeft', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).foldLeft( 1 )( ( acc, v ) => acc + v ), 46, "foldLeft failed" )
         deepEqual( seq<number>( iter ).foldLeft( 1 )( ( acc, v ) => acc + v ), 46, "foldLeft failed" )
@@ -166,7 +174,6 @@ describe( 'Seq', function () {
         done()
     } )
 
-
     it( 'indexOf', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).indexOf( 2 ), 2, "indexOf failed" )
         deepEqual( seq<number>( arr ).indexOf( 2, 3 ), -1, "indexOf failed" )
@@ -179,6 +186,13 @@ describe( 'Seq', function () {
         deepEqual( seq<number>( arr ).isEmpty, false, "isEmpty failed" )
         deepEqual( seq<number>( [] ).isEmpty, true, "isEmpty failed" )
         deepEqual( seq<number>( iter ).isEmpty, false, "isEmpty failed" )
+        done()
+    } )
+
+    it( 'isIndexedSeq', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).isIndexedSeq, true, "isIndexedSeq failed" )
+        deepEqual( seq<number>( iter ).isIndexedSeq, false, "isIndexedSeq failed" )
+        deepEqual( seq<string>( "abcdef" ).isIndexedSeq, true, "isIndexedSeq failed" )
         done()
     } )
 
@@ -240,6 +254,13 @@ describe( 'Seq', function () {
     it( 'take', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).take( 3 ).toArray, [ 0, 1, 2 ], "take failed" )
         deepEqual( seq<number>( iter ).take( 3 ).toArray, [ 0, 1, 2 ], "take failed" )
+        done()
+    } )
+
+    it( 'toIndexedSeq', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).toIndexedSeq.isIndexedSeq, true, "toIndexedSeq failed" )
+        deepEqual( seq<number>( iter ).toIndexedSeq.isIndexedSeq, true, "toIndexedSeq failed" )
+        deepEqual( seq<string>( "abcdef" ).toIndexedSeq.isIndexedSeq, true, "toIndexedSeq failed" )
         done()
     } )
 
