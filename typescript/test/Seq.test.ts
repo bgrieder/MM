@@ -4,7 +4,9 @@
 
 require( 'source-map-support' ).install()
 import chai = require('chai')
-import {Iterable, Iterator, seq} from '../Seq'
+import {Iterable, Iterator} from '../Iter'
+import {seq} from '../Seq'
+import {none, some} from '../Option'
 
 
 const deepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.deepEqual;
@@ -125,13 +127,13 @@ describe( 'Seq', function () {
         done()
     } )
 
-    // it( 'find', ( done: MochaDone ) => {
-    //     deepEqual( seq<number>( arr ).find( x => x === 3 ), true , "find failed" )
-    //     deepEqual( seq<number>( arr ).find( x => x === 13 ), true , "find failed" )
-    //     deepEqual( seq<number>( iter ).find( x => x === 3 ), true , "find failed" )
-    //     deepEqual( seq<number>( iter ).find( x => x === 13 ), true , "find failed" )
-    //     done()
-    // } )
+    it( 'find', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).find( x => x === 3 ).equals(some(3)), true , "find failed" )
+        deepEqual( seq<number>( arr ).find( x => x === 13 ).equals(none()), true, "find failed" )
+        deepEqual( seq<number>( iter ).find( x => x === 3 ).equals(some(3)), true, "find failed" )
+        deepEqual( seq<number>( iter ).find( x => x === 13 ).equals(none()), true, "find failed" )
+        done()
+    } )
 
     it( 'foldLeft', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).foldLeft( 1 )( ( acc, v ) => acc + v ), 46, "foldLeft failed" )
@@ -189,10 +191,10 @@ describe( 'Seq', function () {
         done()
     } )
 
-    it( 'isIndexedSeq', ( done: MochaDone ) => {
-        deepEqual( seq<number>( arr ).isIndexedSeq, true, "isIndexedSeq failed" )
-        deepEqual( seq<number>( iter ).isIndexedSeq, false, "isIndexedSeq failed" )
-        deepEqual( seq<string>( "abcdef" ).isIndexedSeq, true, "isIndexedSeq failed" )
+    it( 'isIndexed', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).isIndexed, true, "isIndexed failed" )
+        deepEqual( seq<number>( iter ).isIndexed, false, "isIndexed failed" )
+        deepEqual( seq<string>( "abcdef" ).isIndexed, true, "isIndexed failed" )
         done()
     } )
 
@@ -257,10 +259,10 @@ describe( 'Seq', function () {
         done()
     } )
 
-    it( 'toIndexedSeq', ( done: MochaDone ) => {
-        deepEqual( seq<number>( arr ).toIndexedSeq.isIndexedSeq, true, "toIndexedSeq failed" )
-        deepEqual( seq<number>( iter ).toIndexedSeq.isIndexedSeq, true, "toIndexedSeq failed" )
-        deepEqual( seq<string>( "abcdef" ).toIndexedSeq.isIndexedSeq, true, "toIndexedSeq failed" )
+    it( 'toIndexed', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).toIndexed.isIndexed, true, "toIndexed failed" )
+        deepEqual( seq<number>( iter ).toIndexed.isIndexed, true, "toIndexed failed" )
+        deepEqual( seq<string>( "abcdef" ).toIndexed.isIndexed, true, "toIndexed failed" )
         done()
     } )
 
@@ -315,7 +317,7 @@ describe( 'Seq', function () {
     } )
 
     it( 'should build from a string', ( done: MochaDone ) => {
-        deepEqual( seq( "abcd" ).toArray, [ 'a','b','c','d' ], "seq from string failed" )
+        deepEqual( seq( "abcd" ).toArray, [ 'a', 'b', 'c', 'd' ], "seq from string failed" )
         done()
     } )
 
