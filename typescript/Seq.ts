@@ -64,8 +64,19 @@ export class Seq<A> extends Iter<A> {
     // collect<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Seq<B>
 
 
-    //collectFirst<B>(pf: PartialFunction<A, B>): Option<B>
-    // Finds the first element of the Seq for which the given partial function is defined, and applies the partial function to it.
+    /**
+     * Finds the first element of the Seq for which the given partial function is defined, and applies the partial function to it.
+     */
+    collectFirst<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Option<B> {
+        return ( mapper: ( value: A ) => B ) => {
+            try {
+                return some(this.filter( filter ).map( mapper ).head)
+            }
+            catch(e) {
+                return none()
+            }
+        }
+    }
 
     /**
      * Tests whether this Seq contains a given value as an element.

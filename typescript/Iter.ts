@@ -82,7 +82,7 @@ export abstract class Iter<A> implements Iterable<A> {
     /**
      * Returns the element at index.
      * The first element is at index 0
-     * O(1) if the underlying iterable is an IndexedIter, O(n) otherwise
+     * O(1) if the underlying iterable is indexed, O(n) otherwise
      */
     at( index: number ): A {
         if ( index < 0 ) {
@@ -114,10 +114,6 @@ export abstract class Iter<A> implements Iterable<A> {
     collect<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Iter<B> {
         return ( mapper: ( value: A ) => B ) => this.filter( filter ).map( mapper )
     }
-
-
-    //collectFirst<B>(pf: PartialFunction<A, B>): Option<B>
-    // Finds the first element of the Iter for which the given partial function is defined, and applies the partial function to it.
 
     /**
      * Tests whether this Iter contains a given value as an element.
@@ -260,16 +256,6 @@ export abstract class Iter<A> implements Iterable<A> {
         return this.filter( ( value: A ) => !filter( value ) )
     }
 
-    // /**
-    //  * Finds the first value produced by the Iter satisfying a predicate, if any.
-    //  */
-    // find(p: (value: A) => boolean): Option<A> {
-    //     const it: Iterator<A> = this[ Symbol.iterator ]()
-    //     for ( let n = it.next(); !n.done; n = it.next() ) {
-    //         if (p( n.value )) return some<A>(n.value)
-    //     }
-    //     return none()
-    // }
 
     /**
      * Creates a new Iter by applying a function to all values produced by this Iter and concatenating the results.
@@ -406,7 +392,11 @@ export abstract class Iter<A> implements Iterable<A> {
      * Tests whether this Iter is empty.
      */
     get isEmpty(): boolean {
-        return this.size === 0
+        if ( typeof this._value.length !== 'undefined' ) {
+            return this._value.length === 0
+        }
+        const it: Iterator<A> = this[ Symbol.iterator ]()
+        return it.next().done
     }
 
     /**
@@ -508,17 +498,8 @@ export abstract class Iter<A> implements Iterable<A> {
     // reduceLeft<B >: A>(op: (B, A) => B): B
     // Applies a binary operator to all elements of this traversable or Iter, going left to right.
 
-    // reduceLeftOption<B >: A>(op: (B, A) => B): Option<B>
-    // Optionally applies a binary operator to all elements of this traversable or Iter, going left to right.
-
-    // reduceOption<A1 >: A>(op: (A1, A1) => A1): Option<A1>
-    // Reduces the elements of this traversable or Iter, if any, using the specified associative binary operator.
-
     // reduceRight<B >: A>(op: (A, B) => B): B
     // Applies a binary operator to all elements of this traversable or Iter, going right to left.
-
-    // reduceRightOption<B >: A>(op: (A, B) => B): Option<B>
-    // Optionally applies a binary operator to all elements of this traversable or Iter, going right to left.
 
     /**
      * Returns a new Iter with the elements in reverse order

@@ -51,6 +51,14 @@ describe( 'Seq', function () {
         done()
     } )
 
+    it( 'collectFirst', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).collectFirst( x => x === 3 )( x => x * 2 ).equals( some( 6 ) ), true, "collectFirst failed" )
+        deepEqual( seq<number>( arr ).collectFirst( x => x === 13 )( x => x * 2 ).equals( none() ), true, "collectFirst failed" )
+        deepEqual( seq<number>( iter ).collectFirst( x => x === 3 )( x => x * 2 ).equals( some( 6 ) ), true, "collectFirst failed" )
+        deepEqual( seq<number>( iter ).collectFirst( x => x === 13 )( x => x * 2 ).equals( none() ), true, "collectFirst failed" )
+        done()
+    } )
+
     it( 'concat', ( done: MochaDone ) => {
         const a1 = seq( [ 1, 2, 3 ] )
         const a2 = seq( [ 4, 5, 6 ] )
@@ -128,10 +136,10 @@ describe( 'Seq', function () {
     } )
 
     it( 'find', ( done: MochaDone ) => {
-        deepEqual( seq<number>( arr ).find( x => x === 3 ).equals(some(3)), true , "find failed" )
-        deepEqual( seq<number>( arr ).find( x => x === 13 ).equals(none()), true, "find failed" )
-        deepEqual( seq<number>( iter ).find( x => x === 3 ).equals(some(3)), true, "find failed" )
-        deepEqual( seq<number>( iter ).find( x => x === 13 ).equals(none()), true, "find failed" )
+        deepEqual( seq<number>( arr ).find( x => x === 3 ).equals( some( 3 ) ), true, "find failed" )
+        deepEqual( seq<number>( arr ).find( x => x === 13 ).equals( none() ), true, "find failed" )
+        deepEqual( seq<number>( iter ).find( x => x === 3 ).equals( some( 3 ) ), true, "find failed" )
+        deepEqual( seq<number>( iter ).find( x => x === 13 ).equals( none() ), true, "find failed" )
         done()
     } )
 

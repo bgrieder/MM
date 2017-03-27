@@ -19,17 +19,17 @@ export abstract class Option<A> extends Iter<A> {
     /**
      * Returns the option's value.
      */
-    abstract get: A
+    abstract get get(): A
 
     /**
      * Returns true if the option is None, false otherwise.
      */
-    abstract isEmpty: boolean
+    abstract get isEmpty(): boolean
 
     /**
      * The size of this Option
      */
-    abstract size: number
+    abstract get size(): number
 
 
     // abstract def productElement(n: number): any
@@ -71,7 +71,6 @@ export abstract class Option<A> extends Iter<A> {
     collect<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Option<B> {
         return ( mapper: ( value: A ) => B ) => this.isEmpty ? this as None  : this.filter( filter ).map( mapper )
     }
-
 
     // collectFirst<B>(pf: PartialFunction<A, B>): Option<B>
     // Finds the first element of the iterable collection for which the given partial function is defined, and applies the partial function to it.
