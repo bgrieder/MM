@@ -2,10 +2,10 @@
  * Created by Bruno Grieder.
  */
 import {eq} from './impl/Utils'
-import {Iter, Iterator} from './Iter'
+import {Collection, Iterator} from './Iter'
 
 
-export abstract class Option<A> extends Iter<A> {
+export abstract class Option<A> extends Collection<A> {
 
 
     // Abstract Value Members
@@ -14,7 +14,7 @@ export abstract class Option<A> extends Iter<A> {
      * Test whether these two Options are equal by testing equality on their values
      * Equality on values is tested first by using an `equals` method if it exists, or `===` otherwise
      */
-    abstract equals( that: Iter<A> ): boolean
+    abstract equals( that: Collection<A> ): boolean
 
     /**
      * Returns the option's value.

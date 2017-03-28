@@ -1,14 +1,14 @@
 /**
  * Created by Bruno Grieder.
  */
-import {Iter, Iterator} from './Iter'
+import {Collection, Iterator} from './Iter'
 import {none, Option, some} from './Option'
 
 
 /**
  * A Seq is an ordered list of elements
  */
-export class Seq<A> extends Iter<A> {
+export class Seq<A> extends Collection<A> {
 
     static from<A>( ...vals: any[] ): Seq<A> {
         if ( vals.length === 0 ) {
