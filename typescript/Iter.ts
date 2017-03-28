@@ -106,20 +106,13 @@ export abstract class Collection<A> implements Iterable<A> {
     }
 
     // buffered: BufferedIter<A>
-    // Creates a buffered Collection from this Iter.
+    // Creates a buffered Collection from this Collection
 
     /**
      * Creates a Collection by transforming values produced by this Collection with a partial function, dropping those values for which the partial function is not defined.
      */
     collect<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Collection<B> {
         return ( mapper: ( value: A ) => B ) => this.filter( filter ).map( mapper )
-    }
-
-    /**
-     * Tests whether this Collection contains a given value as an element.
-     */
-    contains( elem: any ): boolean {
-        return this.indexOf( elem ) !== -1
     }
 
     /**
@@ -148,6 +141,15 @@ export abstract class Collection<A> implements Iterable<A> {
         }
         return this.build( next )
     }
+
+
+    /**
+     * Tests whether this Collection contains a given value as an element.
+     */
+    contains( elem: any ): boolean {
+        return this.indexOf( elem ) !== -1
+    }
+
 
     // copyToArray(xs: Array<A>, start: number, len: number): Unit
     // <use case> Copies selected values produced by this Collection to an array.
@@ -242,7 +244,7 @@ export abstract class Collection<A> implements Iterable<A> {
     }
 
     /**
-     * Tests whether a predicate holds for some of the values produced by this Iter.
+     * Tests whether a predicate holds for some of the values produced by this Collection
      */
     exists( p: ( value: A ) => boolean ): boolean {
         return this.filter( p ).take( 1 ).size === 1
@@ -282,8 +284,8 @@ export abstract class Collection<A> implements Iterable<A> {
     }
 
     /**
-     * Converts this Iteruence of iterables into a Iteruence formed by the elements of the iterables.
-     * e.g. Iter( Iter(1,2), Iter(3,4) ).flatten() = Iter(1,2,3,4)
+     * Converts this Collection of Collections into a Collection formed by the elements of the Collections
+     * e.g. seq( seq(1,2), seq(3,4) ).flatten() = seq(1,2,3,4)
      */
     flatten<U>(): Collection<U> {
 
@@ -345,7 +347,7 @@ export abstract class Collection<A> implements Iterable<A> {
     }
 
     /**
-     * Tests whether a predicate holds for all values produced by this Iter.
+     * Tests whether a predicate holds for all values produced by this Collection
      */
     forall( p: ( value: A ) => boolean ): boolean {
         const it: Iterator<A> = this[ Symbol.iterator ]()
@@ -356,7 +358,7 @@ export abstract class Collection<A> implements Iterable<A> {
     }
 
     /**
-     * Applies a function f to all values produced by this Iter.
+     * Applies a function f to all values produced by this Collection
      */
     foreach( f: ( value: A ) => void ): void {
         const it: Iterator<A> = this[ Symbol.iterator ]()
@@ -580,7 +582,7 @@ export abstract class Collection<A> implements Iterable<A> {
     }
 
     /**
-     * Creates a Collection returning an interval of the values produced by this Iter.
+     * Creates a Collection returning an interval of the values produced by this Collection
      */
     slice( from: number, until: number ): Collection<A> {
         return Array.isArray( this._value ) ?
@@ -590,7 +592,7 @@ export abstract class Collection<A> implements Iterable<A> {
     }
 
     // sliding<B >: A>(size: number, step: number = 1): GroupedCollection<B>
-    // Returns a Collection which presents a "sliding window" view of another Iter.
+    // Returns a Collection which presents a "sliding window" view of another Collection
 
     // span(p: (A) => Boolean): (Iter<A>, Iter<A>)
     // Splits this Collection into a prefix/suffix pair according to a predicate.

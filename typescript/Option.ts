@@ -47,133 +47,110 @@ export abstract class Option<A> extends Collection<A> {
     // ++:<B>(that: collection.TraversableOnce<B>): Option<B>
     // <use case> As with ++, returns a new collection containing the elements from the left operand followed by the elements from the right operand.
 
-    // /:<B>(z: B)(op: (B, A) => B): B
-    // Applies a binary operator to a start value and all elements of this iterable collection, going left to right.
-
-    // :\<B>(z: B)(op: (A, B) => B): B
-    // Applies a binary operator to all elements of this iterable collection and a start value, going right to left.
-
-    // addstring(b: stringBuilder): stringBuilder
-    // Appends all elements of this iterable collection to a string builder.
-
-    // addstring(b: stringBuilder, sep: string): stringBuilder
-    // Appends all elements of this iterable collection to a string builder using a separator string.
-
-    // addstring(b: stringBuilder, start: string, sep: string, end: string): stringBuilder
-    // Appends all elements of this iterable collection to a string builder using start, end, and separator strings.
-
-    // aggregate<B>(z: => B)(seqop: (B, A) => B, combop: (B, B) => B): B
-    // Aggregates the results of applying an operator to subsequent elements.
-
     /**
      * Returns a Some containing the result of applying pf to this Option's contained value, if this option is nonempty and pf is defined for that value.
      */
     collect<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Option<B> {
-        return ( mapper: ( value: A ) => B ) => this.isEmpty ? this as None  : this.filter( filter ).map( mapper )
+        return ( mapper: ( value: A ) => B ) => this.isEmpty ? this as None : this.filter( filter ).map( mapper )
     }
 
-    // collectFirst<B>(pf: PartialFunction<A, B>): Option<B>
-    // Finds the first element of the iterable collection for which the given partial function is defined, and applies the partial function to it.
+    /**
+     * Tests whether the value of the Option pass the filter, and applies the partial function to it.
+     */
+    collectFirst<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Option<B> {
+        return ( mapper: ( value: A ) => B ) => {
+            try {
+                return this.isEmpty ? this as None : some( this.filter( filter ).map( mapper ).get )
+            }
+            catch ( e ) {
+                return none()
+            }
+        }
+    }
 
-    // companion: GenericCompanion<collection.Seq>
-    // The factory companion object that builds instances of class Seq.
-
-    // concat( that: Seq<A> ): Option<A> {
-    //     return super.concat( that ) as Option<A>
-    // }
-
-
-    // contains<A1 >: A>(elem: A1): boolean
-    // Tests whether the option contains a given value as an element.
-
-    // copyToArray(xs: Array<A>, start: number, len: number): Unit
-    // <use case> Copies the elements of this option to an array.
-
-    // copyToArray(xs: Array<A>): Unit
-    // <use case> Copies the elements of this option to an array.
-
-    // copyToArray(xs: Array<A>, start: number): Unit
-    // <use case> Copies the elements of this option to an array.
-
-    // copyToBuffer<B >: A>(dest: Buffer<B>): Unit
-    // Copies all elements of this iterable collection to a buffer.
-
-    // count(p: (A) => boolean): number
-    // Counts the number of elements in the iterable collection which satisfy a predicate.
-
-    // drop(n: number): collection.Seq<A>
-    // Selects all elements except first n ones.
-
-    // dropRight(n: number): collection.Seq<A>
-    // Selects all elements except last n ones.
-
-    // dropWhile(p: (A) => boolean): collection.Seq<A>
-    // Drops longest prefix of elements that satisfy a predicate.
-
-    // exists(p: (A) => boolean): boolean
-    // Returns true if this option is nonempty and the predicate p returns true when applied to this Option's value.
+    /**
+     * Returns true if this option is nonempty and the predicate p returns true when applied to this Option's value.
+     */
+    exists( p: ( value: A ) => boolean ): boolean {
+        return this.isEmpty ? false : this.filter( p ).take( 1 ).size === 1
+    }
 
     /**
      * Returns this Option if it is nonempty and applying the predicate p to this Option's value returns true.
      */
     filter( f: ( value: A ) => boolean ): Option<A> {
-        return this.isEmpty || f(this.get) ? this : none()
+        return this.isEmpty || f( this.get ) ? this : none()
     }
 
     /**
      * Returns this Option if it is nonempty and applying the predicate p to this Option's value returns false.
      */
     filterNot( f: ( value: A ) => boolean ): Option<A> {
-        return this.isEmpty || !f(this.get) ? this : none()
+        return this.isEmpty || !f( this.get ) ? this : none()
     }
 
-    // find(p: (A) => boolean): Option<A>
-    // Finds the first element of the iterable collection satisfying a predicate, if any.
+    /**
+     * Finds the first element of the iterable collection satisfying a predicate, if any.
+     */
+    find( p: ( value: A ) => boolean ): Option<A> {
+        return this.isEmpty ? this as None : (p( this.get ) ? this : none())
+    }
 
     /**
      * Returns the result of applying f to this Option's value if this Option is nonempty.
      */
     flatMap<U>( f: ( value: A ) => Option<U> ): Option<U> {
-        return this.isEmpty ? this as None  :  super.flatMap( f ) as Option<U>
+        return this.isEmpty ? this as None : super.flatMap( f ) as Option<U>
     }
 
+    /**
+     * Converts this Option of Option into an Option
+     * e.g. some( some(1) ).flatten() = some(1)
+     */
     flatten<U>(): Option<U> {
-        return this.isEmpty ? this as None  :  super.flatten() as Option<U>
+        return this.isEmpty ? this as None : super.flatten() as Option<U>
     }
 
+    /**
+     * Returns true if this option is empty or the predicate p returns true when applied to this Option's value.
+     */
+    forall( p: ( value: A ) => boolean ): boolean {
+        return this.isEmpty ? true : p(this.get)
+    }
 
-    // fold<B>(ifEmpty: => B)(f: (A) => B): B
-    // Returns the result of applying f to this Option's value if the Option is nonempty.
+    /**
+     * Apply the given procedure f to the option's value, if it is nonempty.
+     */
+    foreach( f: ( value: A ) => void ): void {
+        if (!this.isEmpty) {
+            f(this.get)
+        }
+    }
 
-    // foldLeft<B>(z: B)(op: (B, A) => B): B
-    // Applies a binary operator to a start value and all elements of this iterable collection, going left to right.
-
-    // foldRight<B>(z: B)(op: (A, B) => B): B
-    // Applies a binary operator to all elements of this iterable collection and a start value, going right to left.
-
-    // forall(p: (A) => boolean): boolean
-    // Returns true if this option is empty or the predicate p returns true when applied to this Option's value.
-
-    // foreach<U>(f: (A) => U): Unit
-    // Apply the given procedure f to the option's value, if it is nonempty.
-
-    // genericBuilder<B>: Builder<B, collection.Seq<B>>
-    // The generic builder that builds instances of Seq at arbitrary element types.
-
-    // getOrElse<B >: A>(default: => B): B
-    // Returns the option's value if the option is nonempty, otherwise return the result of evaluating default.
+    /**
+     * Returns the option's value if the option is nonempty, otherwise return the result of evaluating default.
+     */
+    getOrElse<U>( elseVal: () => U ): A | U {
+        return this.isEmpty ? elseVal() : this.get
+    }
 
     // groupBy<K>(f: (A) => K): Map<K, collection.Seq<A>>
     // Partitions this iterable collection into a map of iterable collections according to some discriminator function.
 
-    // grouped(size: number): collection.Iterator<collection.Seq<A>>
-    // Partitions elements in fixed size iterable collections.
 
-    // hasDefiniteSize: boolean
-    // Tests whether this iterable collection is known to have a finite size.
+    /**
+     * Tests whether this iterable collection is known to have a finite size.
+     */
+    get hasDefiniteSize(): boolean {
+        return true
+    }
 
-    // head: A
-    // Selects the first element of this iterable collection.
+    /**
+     * Selects the first element of this collection.
+     */
+    get head(): A {
+        return this.get
+    }
 
     // headOption: Option<A>
     // Optionally selects the first element.
@@ -451,12 +428,9 @@ export abstract class Option<A> extends Collection<A> {
     // Creates a non-strict filter of this iterable collection.
 
 
-
-
     // filterNot( test: ( value: A ) => boolean ): Option<A> {
     //     return undefined
     // }
-
 
 
     orElse( alternative: () => Option<A> ): Option<A> {
@@ -469,14 +443,6 @@ export abstract class Option<A> extends Collection<A> {
     }
 
 
-    getOrElse<U>( elseVal: () => U ): A | U {
-        const it: Iterator<A> = this[ Symbol.iterator ]()
-        const n = it.next()
-        if ( n.done ) {
-            return elseVal()
-        }
-        return n.value
-    }
 
 
     get toPromise(): Promise<A> {
@@ -487,9 +453,17 @@ export abstract class Option<A> extends Collection<A> {
 
 export class Some<A> extends Option<A> {
 
-    static from<A>( value: any ): Some<A> {
-        return new Some<A>( [ value ] )
+    private readonly _optVal : any
+
+    static from<A>( optVal: any ): Some<A> {
+        return new Some<A>( optVal )
     }
+
+    protected constructor( optVal: any ) {
+        super([optVal])
+        this._optVal = optVal
+    }
+
 
     equals( that: Option<A> ): boolean {
         if ( that instanceof Some ) {
@@ -499,9 +473,8 @@ export class Some<A> extends Option<A> {
     }
 
     get get(): A {
-        return this.head
+        return this._optVal
     }
-
 
     get isEmpty(): boolean {
         return false
@@ -519,8 +492,8 @@ export function some<A>( value: A ): Some<A> {
 
 export class None extends Option<any> {
 
-    static from( ): None {
-        return new None([])
+    static from(): None {
+        return new None( [] )
     }
 
     equals( that: Option<any> ): boolean {
@@ -529,7 +502,7 @@ export class None extends Option<any> {
 
     //noinspection JSMethodCanBeStatic
     get get(): any {
-        throw new Error("No such element")
+        throw new Error( "No such element in None" )
     }
 
 
@@ -542,12 +515,12 @@ export class None extends Option<any> {
     }
 }
 
-export function none( ) {
-    return None.from(  )
+export function none() {
+    return None.from()
 }
 
 
 export function option<A>( value: A ): Option<A> {
-    return (typeof value === 'undefined' || value === null) ? this : some<A>(value)
+    return (typeof value === 'undefined' || value === null) ? this : some<A>( value )
 }
 
