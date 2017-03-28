@@ -92,6 +92,16 @@ describe( 'Seq', function () {
         done()
     } )
 
+    it( 'dropWhile', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).dropWhile( w => w < 3 ).head, 3, "dropWhile failed" )
+        deepEqual( seq<number>( arr ).dropWhile(  w => w < 3 ).size, 7, "dropWhile failed" )
+        deepEqual( seq<number>( arr ).dropWhile(  w => w < 50 ).size, 0, "dropWhile failed" )
+        deepEqual( seq<number>( iter ).dropWhile( w => w < 3 ).head, 3, "dropWhile failed" )
+        deepEqual( seq<number>( iter ).dropWhile(  w => w < 3 ).size, 7, "dropWhile failed" )
+        deepEqual( seq<number>( iter ).dropWhile(  w => w < 50 ).size, 0, "dropWhile failed" )
+        done()
+    } )
+
     it( 'equals', ( done: MochaDone ) => {
         const a1 = seq( [ 1, 2, 3 ] )
         deepEqual( a1.equals( seq( [ 1, 2, 3 ] ) ), true, "equals failed" )
@@ -152,6 +162,14 @@ describe( 'Seq', function () {
     it( 'foldRight', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).foldRight( 1 )( ( acc, v ) => acc + v ), 46, "foldRight failed" )
         deepEqual( seq<number>( iter ).foldRight( 1 )( ( acc, v ) => acc + v ), 46, "foldRight failed" )
+        done()
+    } )
+
+    it( 'forall', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).forall( v => v < 50 ), true, "forall failed" )
+        deepEqual( seq<number>( arr ).forall( v => v < 3 ), false, "forall failed" )
+        deepEqual( seq<number>( iter ).forall( v => v < 50 ), true, "forall failed" )
+        deepEqual( seq<number>( iter ).forall( v => v < 3 ), false, "forall failed" )
         done()
     } )
 

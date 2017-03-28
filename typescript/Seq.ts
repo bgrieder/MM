@@ -51,9 +51,11 @@ export class Seq<A> extends Iter<A> {
     /**
      * Returns the element at index.
      * The first element is at index 0
-     * O(1) if the underlying iterable is an IndexedSeq, O(n) otherwise
+     * O(1) if the underlying iterable is indexed, O(n) otherwise
      */
-    // at( index: number ): A;
+    at( index: number ): A {
+        return super.at( index )
+    }
 
     // buffered: BufferedSeq<A>
     // Creates a buffered Seq from this Seq.
@@ -61,7 +63,9 @@ export class Seq<A> extends Iter<A> {
     /**
      * Creates a Seq by transforming values produced by this Seq with a partial function, dropping those values for which the partial function is not defined.
      */
-    // collect<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Seq<B>
+    collect<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Seq<B> {
+        return ( mapper: ( value: A ) => B ) => this.filter( filter ).map( mapper ) as Seq<B>
+    }
 
 
     /**
@@ -70,9 +74,9 @@ export class Seq<A> extends Iter<A> {
     collectFirst<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Option<B> {
         return ( mapper: ( value: A ) => B ) => {
             try {
-                return some(this.filter( filter ).map( mapper ).head)
+                return some( this.filter( filter ).map( mapper ).head )
             }
-            catch(e) {
+            catch ( e ) {
                 return none()
             }
         }
@@ -81,14 +85,16 @@ export class Seq<A> extends Iter<A> {
     /**
      * Tests whether this Seq contains a given value as an element.
      */
-    // contains( elem: any ): boolean {
-    //     return this.indexOf( elem ) !== -1
-    // }
+    contains( elem: any ): boolean {
+        return super.contains( elem )
+    }
 
     /**
-     * [use case] Concatenates this Seq with another.
+     * Concatenates this Seq with another.
      */
-    // concat( that: Seq<A> ): Seq<A>
+    concat( that: Seq<A> ): Seq<A> {
+        return super.concat( that ) as Seq<A>
+    }
 
     // copyToArray(xs: Array<A>, start: number, len: number): Unit
     // <use case> Copies selected values produced by this Seq to an array.
@@ -109,16 +115,24 @@ export class Seq<A> extends Iter<A> {
     /**
      * Counts the number of elements in the Seq which satisfy a predicate.
      */
-    // count( p: ( value: A ) => boolean ): number
+    count( p: ( value: A ) => boolean ): number {
+        return super.count( p )
+    }
 
 
     /**
      * Advances this Seq past the first n elements, or the length of the Seq, whichever is smaller.
      */
-    // drop( n: number ): Seq<A>
+    drop( n: number ): Seq<A> {
+        return super.drop( n ) as Seq<A>
+    }
 
-    // dropWhile(p: (A) => Boolean): Seq<A>
-    // Skips longest Sequence of elements of this Seq which satisfy given predicate p, and returns a Seq of the remaining elements.
+    /**
+     * Skips longest Sequence of elements of this Seq which satisfy given predicate p, and returns a Seq of the remaining elements.
+     */
+    dropWhile(p: (value: A) => Boolean): Seq<A> {
+        return super.dropWhile(p) as Seq<A>
+    }
 
     // duplicate: (Seq<A>, Seq<A>)
     // Creates two new Seqs that both iterate over the same elements as this Seq (in the same order).
@@ -127,30 +141,38 @@ export class Seq<A> extends Iter<A> {
      * Test whether these two Seqs are equal by testing equality on all elements
      * Equality on elements is tested first by using an `equals` method if it exists, or `===` otherwise
      */
-    // equals( that: Seq<A> ): boolean
+    equals( that: Seq<A> ): boolean {
+        return super.equals( that )
+    }
 
     /**
      * Tests whether a predicate holds for some of the values produced by this Seq.
      */
-    // exists( p: ( value: A ) => boolean ): boolean
+    exists( p: ( value: A ) => boolean ): boolean {
+        return super.exists( p )
+    }
 
     /**
      * Returns a Seq over all the elements of this Seq that satisfy the predicate p.
      */
-    // filter( filter: ( value: A ) => boolean ): Seq<A>
+    filter( filter: ( value: A ) => boolean ): Seq<A> {
+        return super.filter( filter ) as Seq<A>
+    }
 
     /**
      * Creates a Seq over all the elements of this Seq which do not satisfy a predicate p.
      */
-    // filterNot( filter: ( value: A ) => boolean ): Seq<A>
+    filterNot( filter: ( value: A ) => boolean ): Seq<A> {
+        return super.filterNot( filter ) as Seq<A>
+    }
 
     /**
      * Finds the first value produced by the Seq satisfying a predicate, if any.
      */
-    find(p: (value: A) => boolean): Option<A> {
+    find( p: ( value: A ) => boolean ): Option<A> {
         const it: Iterator<A> = this[ Symbol.iterator ]()
         for ( let n = it.next(); !n.done; n = it.next() ) {
-            if (p( n.value )) return some<A>(n.value)
+            if ( p( n.value ) ) return some<A>( n.value )
         }
         return none()
     }
@@ -158,13 +180,17 @@ export class Seq<A> extends Iter<A> {
     /**
      * Creates a new Seq by applying a function to all values produced by this Seq and concatenating the results.
      */
-    // flatMap<B>( f: ( value: A, index?: number ) => Seq<B> ): Seq<B>
+    flatMap<B>( f: ( value: A, index?: number ) => Seq<B> ): Seq<B> {
+        return super.flatMap<B>( f ) as Seq<B>
+    }
 
     /**
      * Converts this Sequence of iterables into a Sequence formed by the elements of the iterables.
-     * e.g. Seq( Seq(1,2), Seq(3,4) ).flatten() = Seq(1,2,3,4)
+     * e.g. seq( seq(1,2), seq(3,4) ).flatten() = seq(1,2,3,4)
      */
-    // flatten<U>(): Seq<U>
+    flatten<U>(): Seq<U> {
+        return super.flatten<U>() as Seq<U>
+    }
 
     // fold<A1 >: A>(z: A1)(op: (A1, A1) => A1): A1
     // Folds the elements of this Seq using the specified associative binary operator.
@@ -172,20 +198,30 @@ export class Seq<A> extends Iter<A> {
     /**
      * Applies a binary operator to a start value and all elements of Seq, going left to right.
      */
-    // foldLeft<B>( initialValue: B ): ( op: ( accumulator: B, value: A, index?: number ) => B ) => B
+    foldLeft<B>( initialValue: B ): ( op: ( accumulator: B, value: A, index?: number ) => B ) => B {
+        return ( op: ( accumulator: B, value: A, index?: number ) => B ) => super.foldLeft( initialValue )( op )
+    }
 
     /**
      * Applies a binary operator to all elements of Seq and a start value, going right to left.
      */
-    // foldRight<B>( initialValue: B ): ( op: ( accumulator: B, value: A, index?: number ) => B ) => B
+    foldRight<B>( initialValue: B ): ( op: ( accumulator: B, value: A, index?: number ) => B ) => B {
+        return ( op: ( accumulator: B, value: A, index?: number ) => B ) => super.foldRight( initialValue )( op )
+    }
 
-    // forall(p: (A) => Boolean): Boolean
-    // Tests whether a predicate holds for all values produced by this Seq.
+    /**
+     * Tests whether a predicate holds for all values produced by this Seq.
+     */
+    forall( p: ( value: A ) => boolean ): boolean {
+        return super.forall(p)
+    }
 
     /**
      * Applies a function f to all values produced by this Seq.
      */
-    // foreach( f: ( value: A ) => void ): void
+    foreach( f: ( value: A ) => void ): void {
+        return super.foreach( f )
+    }
 
     // grouped<B >: A>(size: number): GroupedIterable<B>
     // Returns a Seq which groups this Seq into fixed size blocks.
@@ -193,9 +229,7 @@ export class Seq<A> extends Iter<A> {
     /**
      * Tests whether this Iterable has a known size.
      */
-    // get hasDefiniteSize(): boolean {
-    //     return typeof this._value.length !== 'undefined' || Array.isArray( this._value )
-    // }
+    // get hasDefiniteSize(): boolean
 
     /**
      * Selects the first element of this Seq
@@ -206,7 +240,9 @@ export class Seq<A> extends Iter<A> {
     /**
      * Returns the index of the first occurrence of the specified object in Seq after or at some optional start index.
      */
-    // indexOf( elem: A, from?: number ): number
+    indexOf( elem: A, from?: number ): number {
+        return super.indexOf( elem, from )
+    }
 
 
     // indexWhere(p: (A) => Boolean, from: number): number
@@ -237,7 +273,9 @@ export class Seq<A> extends Iter<A> {
     /**
      * Creates a new Seq that maps all produced values of this Seq to new values using a transformation function.
      */
-    // map<B>( f: ( value: A, index?: number ) => B ): Seq<B>
+    map<B>( f: ( value: A, index?: number ) => B ): Seq<B> {
+        return super.map<B>( f ) as Seq<B>
+    }
 
     // max: A
     // <use case> Finds the largest element.
@@ -254,17 +292,19 @@ export class Seq<A> extends Iter<A> {
     /**
      * Displays all elements of this Seq in a string using an optional separator string.
      */
-    // mkString( sep?: string ): string;
+    mkString( sep?: string ): string;
 
     /**
      * Displays all elements of this Seq in a string using start, end, and separator strings.
      */
-    // mkString( start?: string, sep?: string, end?: string ): string;
+    mkString( start?: string, sep?: string, end?: string ): string;
 
     /**
      * Displays all elements of this Seq in a string using start, end, and separator strings.
      */
-    // mkString( startOrSep?: string, sep?: string, end?: string ): string
+    mkString( startOrSep?: string, sep?: string, end?: string ): string {
+        return super.mkString( startOrSep, sep, end )
+    }
 
     // nonEmpty: Boolean
     // Tests whether the Seq is not empty.
@@ -324,7 +364,9 @@ export class Seq<A> extends Iter<A> {
     /**
      * Creates a Seq returning an interval of the values produced by this Seq.
      */
-    // slice( from: number, until: number ): Seq<A>
+    slice( from: number, until: number ): Seq<A> {
+        return super.slice(from, until) as Seq<A>
+    }
 
     // sliding<B >: A>(size: number, step: number = 1): GroupedIterable<B>
     // Returns a Seq which presents a "sliding window" view of another Seq.
@@ -345,7 +387,9 @@ export class Seq<A> extends Iter<A> {
     /**
      * Selects first n values of this Seq.
      */
-    // take( n: number ): Seq<A>
+    take( n: number ): Seq<A> {
+        return super.take(n) as Seq<A>
+    }
 
     // takeWhile(p: (A) => Boolean): Seq<A>
     // Takes longest prefix of values produced by this Seq that satisfy a predicate.
@@ -357,6 +401,7 @@ export class Seq<A> extends Iter<A> {
      * Converts this Seq to an array.
      */
     // get toArray(): Array<A>
+
     // toBuffer<B >: A>: Buffer<B>
     // Uses the contents of this Seq to create a new mutable buffer.
 

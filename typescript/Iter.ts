@@ -39,7 +39,7 @@ export abstract class Iter<A> implements Iterable<A> {
 
     private _value: Iterable<A>
 
-    protected constructor( value: any) {
+    protected constructor( value: any ) {
         this._value = value
     }
 
@@ -65,16 +65,16 @@ export abstract class Iter<A> implements Iterable<A> {
     // Applies a binary operator to a start value and all elements of this traversable or Iter, going left to right.
 
     // :\<B>(z: B)(op: (A, B) => B): B
-    // Applies a binary operator to all elements of this Iter and a start value, going right to left.
+    // Applies a binary operator to all elements of this Iterable and a start value, going right to left.
 
     // addString(b: StringBuilder): StringBuilder
-    // Appends all elements of this Iter to a string builder.
+    // Appends all elements of this Iterable to a string builder.
 
     // addString(b: StringBuilder, sep: String): StringBuilder
-    // Appends all elements of this Iter to a string builder using a separator string.
+    // Appends all elements of this Iterable to a string builder using a separator string.
 
     // addString(b: StringBuilder, start: String, sep: String, end: String): StringBuilder
-    // Appends all elements of this Iter to a string builder using start, end, and separator strings.
+    // Appends all elements of this Iterable to a string builder using start, end, and separator strings.
 
     // aggregate<B>(z: => B)(seqop: (B, A) => B, combop: (B, B) => B): B
     // Aggregates the results of applying an operator to subsequent elements.
@@ -106,24 +106,24 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     // buffered: BufferedIter<A>
-    // Creates a buffered Iter from this Iter.
+    // Creates a buffered Iterable from this Iter.
 
     /**
-     * Creates a Iter by transforming values produced by this Iter with a partial function, dropping those values for which the partial function is not defined.
+     * Creates a Iterable by transforming values produced by this Iterable with a partial function, dropping those values for which the partial function is not defined.
      */
     collect<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Iter<B> {
         return ( mapper: ( value: A ) => B ) => this.filter( filter ).map( mapper )
     }
 
     /**
-     * Tests whether this Iter contains a given value as an element.
+     * Tests whether this Iterable contains a given value as an element.
      */
     contains( elem: any ): boolean {
         return this.indexOf( elem ) !== -1
     }
 
     /**
-     * [use case] Concatenates this Iter with another.
+     * [use case] Concatenates this Iterable with another.
      */
     concat( that: Iter<A> ): Iter<A> {
 
@@ -150,23 +150,23 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     // copyToArray(xs: Array<A>, start: number, len: number): Unit
-    // <use case> Copies selected values produced by this Iter to an array.
+    // <use case> Copies selected values produced by this Iterable to an array.
 
     // copyToArray(xs: Array<A>): Unit
-    // <use case> Copies the elements of this Iter to an array.
+    // <use case> Copies the elements of this Iterable to an array.
 
     // copyToArray(xs: Array<A>, start: number): Unit
-    // <use case> Copies the elements of this Iter to an array.
+    // <use case> Copies the elements of this Iterable to an array.
 
     // copyToBuffer<B >: A>(dest: Buffer<B>): Unit
-    // Copies all elements of this Iter to a buffer.
+    // Copies all elements of this Iterable to a buffer.
 
     // corresponds<B>(that: GenTraversableOnce<B>)(p: (A, B) => Boolean): Boolean
-    // Tests whether every element of this Iter relates to the corresponding element of another collection by satisfying a test predicate.
+    // Tests whether every element of this Iterable relates to the corresponding element of another collection by satisfying a test predicate.
 
 
     /**
-     * Counts the number of elements in the Iter which satisfy a predicate.
+     * Counts the number of elements in the Iterable which satisfy a predicate.
      */
     count( p: ( value: A ) => boolean ): number {
         return this.filter( p ).size
@@ -174,7 +174,7 @@ export abstract class Iter<A> implements Iterable<A> {
 
 
     /**
-     * Advances this Iter past the first n elements, or the length of the Iter, whichever is smaller.
+     * Advances this Iterable past the first n elements, or the length of the Iter, whichever is smaller.
      */
     drop( n: number ): Iter<A> {
         const it: Iterator<A> = this[ Symbol.iterator ]()
@@ -193,11 +193,28 @@ export abstract class Iter<A> implements Iterable<A> {
         return this.build<A>( next )
     }
 
-    // dropWhile(p: (A) => Boolean): Iter<A>
-    // Skips longest Iteruence of elements of this Iter which satisfy given predicate p, and returns a Iter of the remaining elements.
+    /**
+     * Skips longest sequence of elements of this Iterable which satisfy given predicate p, and returns a Iterable of the remaining elements.
+     */
+    dropWhile( p: ( value: A ) => Boolean ): Iter<A> {
+        const it: Iterator<A> = this[ Symbol.iterator ]()
+        let i = 0
+        const next = (): { done: boolean, value?: A } => {
+            const nv = it.next()
+            if ( nv.done ) {
+                return { done: true }
+            }
+            i = i + 1
+            if ( p( nv.value ) ) {
+                return next()
+            }
+            return { done: false, value: nv.value }
+        }
+        return this.build<A>( next )
+    }
 
     // duplicate: (Iter<A>, Iter<A>)
-    // Creates two new Iters that both iterate over the same elements as this Iter (in the same order).
+    // Creates two new Iters that both iterate over the same elements as this Iterable (in the same order).
 
     /**
      * Test whether these two Iters are equal by testing equality on all elements
@@ -232,7 +249,7 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     /**
-     * Returns a Iter over all the elements of this Iter that satisfy the predicate p.
+     * Returns a Iterable over all the elements of this Iterable that satisfy the predicate p.
      */
     filter( filter: ( value: A ) => boolean ): Iter<A> {
         const it: Iterator<A> = this[ Symbol.iterator ]()
@@ -250,7 +267,7 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     /**
-     * Creates a Iter over all the elements of this Iter which do not satisfy a predicate p.
+     * Creates a Iterable over all the elements of this Iterable which do not satisfy a predicate p.
      */
     filterNot( filter: ( value: A ) => boolean ): Iter<A> {
         return this.filter( ( value: A ) => !filter( value ) )
@@ -258,7 +275,7 @@ export abstract class Iter<A> implements Iterable<A> {
 
 
     /**
-     * Creates a new Iter by applying a function to all values produced by this Iter and concatenating the results.
+     * Creates a new Iterable by applying a function to all values produced by this Iterable and concatenating the results.
      */
     flatMap<B>( f: ( value: A, index?: number ) => Iter<B> ): Iter<B> {
         return this.map<Iter<B>>( f ).flatten<B>()
@@ -302,7 +319,7 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     // fold<A1 >: A>(z: A1)(op: (A1, A1) => A1): A1
-    // Folds the elements of this Iter using the specified associative binary operator.
+    // Folds the elements of this Iterable using the specified associative binary operator.
 
     /**
      * Applies a binary operator to a start value and all elements of Iter, going left to right.
@@ -321,14 +338,22 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     /**
-     * Applies a binary operator to all elements of Iter and a start value, going right to left.
+     * Applies a binary operator to all elements of Iterable and a start value, going right to left.
      */
     foldRight<B>( initialValue: B ): ( op: ( accumulator: B, value: A, index?: number ) => B ) => B {
         return ( op: ( accumulator: B, value: A, index?: number ) => B ): B => this.reverse.foldLeft( initialValue )( op )
     }
 
-    // forall(p: (A) => Boolean): Boolean
-    // Tests whether a predicate holds for all values produced by this Iter.
+    /**
+     * Tests whether a predicate holds for all values produced by this Iter.
+     */
+    forall( p: ( value: A ) => boolean ): boolean {
+        const it: Iterator<A> = this[ Symbol.iterator ]()
+        for ( let n = it.next(); !n.done; n = it.next() ) {
+            if ( !p( n.value ) ) return false
+        }
+        return true
+    }
 
     /**
      * Applies a function f to all values produced by this Iter.
@@ -341,7 +366,7 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     // grouped<B >: A>(size: number): GroupedIterable<B>
-    // Returns a Iter which groups this Iter into fixed size blocks.
+    // Returns a Iterable which groups this Iterable into fixed size blocks.
 
     /**
      * Tests whether this Iterable has a known size.
@@ -351,7 +376,7 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     /**
-     * Selects the first element of this Iter
+     * Selects the first element
      */
     get head(): A {
         const it: Iterator<A> = this[ Symbol.iterator ]()
@@ -362,7 +387,7 @@ export abstract class Iter<A> implements Iterable<A> {
 
 
     /**
-     * Returns the index of the first occurrence of the specified object in Iter after or at some optional start index.
+     * Returns the index of the first occurrence of the specified object in Iterable after or at some optional start index.
      */
     indexOf( elem: A, from?: number ): number {
         if ( Array.isArray( this._value ) ) {
@@ -389,7 +414,7 @@ export abstract class Iter<A> implements Iterable<A> {
     // Returns the index of the first produced value satisfying a predicate, or -1.
 
     /**
-     * Tests whether this Iter is empty.
+     * Tests whether this Iterable is empty.
      */
     get isEmpty(): boolean {
         if ( typeof this._value.length !== 'undefined' ) {
@@ -400,7 +425,7 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     /**
-     * Tests whether this Iter is an Indexed Iter
+     * Tests whether this Iterable is an indexed Iterable
      * i.e. its elements can be accessed using an index
      */
     get isIndexed(): boolean {
@@ -411,14 +436,14 @@ export abstract class Iter<A> implements Iterable<A> {
     // Tests whether this Iterable can be repeatedly traversed.
 
     /**
-     * Returns the number of elements in this Iter.
+     * Returns the number of elements
      */
     get length(): number {
         return this.size
     }
 
     /**
-     * Creates a new Iter that maps all produced values of this Iter to new values using a transformation function.
+     * Creates a new Iterable that maps all produced values of this Iterable to new values using a transformation function.
      */
     map<B>( f: ( value: A, index?: number ) => B ): Iter<B> {
         const it: Iterator<A> = this[ Symbol.iterator ]()
@@ -447,17 +472,17 @@ export abstract class Iter<A> implements Iterable<A> {
     // <use case> Finds the first element which yields the smallest value measured by function f.
 
     /**
-     * Displays all elements of this Iter in a string using an optional separator string.
+     * Displays all elements of this Iterable in a string using an optional separator string.
      */
     mkString( sep?: string ): string;
 
     /**
-     * Displays all elements of this Iter in a string using start, end, and separator strings.
+     * Displays all elements of this Iterable in a string using start, end, and separator strings.
      */
     mkString( start?: string, sep?: string, end?: string ): string;
 
     /**
-     * Displays all elements of this Iter in a string using start, end, and separator strings.
+     * Displays all elements of this Iterable in a string using start, end, and separator strings.
      */
     mkString( startOrSep?: string, sep?: string, end?: string ): string {
         if ( typeof startOrSep === 'undefined' ) {
@@ -478,22 +503,22 @@ export abstract class Iter<A> implements Iterable<A> {
 
 
     // nonEmpty: Boolean
-    // Tests whether the Iter is not empty.
+    // Tests whether the Iterable is not empty.
 
     // padTo(len: number, elem: A): Iter<A>
-    // <use case> Appends an element value to this Iter until a given target length is reached.
+    // <use case> Appends an element value to this Iterable until a given target length is reached.
 
     // partition(p: (A) => Boolean): (Iter<A>, Iter<A>)
-    // Partitions this Iter in two Iters according to a predicate.
+    // Partitions this Iterable in two Iters according to a predicate.
 
     // patch<B >: A>(from: number, patchElems: Iterable<B>, replaced: number): Iterable<B>
-    // Returns this Iter with patched values.
+    // Returns this Iterable with patched values.
 
     // product: A
     // <use case> Multiplies up the elements of this collection.
 
     // reduce<A1 >: A>(op: (A1, A1) => A1): A1
-    // Reduces the elements of this Iter using the specified associative binary operator.
+    // Reduces the elements of this Iterable using the specified associative binary operator.
 
     // reduceLeft<B >: A>(op: (B, A) => B): B
     // Applies a binary operator to all elements of this traversable or Iter, going left to right.
@@ -502,18 +527,18 @@ export abstract class Iter<A> implements Iterable<A> {
     // Applies a binary operator to all elements of this traversable or Iter, going right to left.
 
     /**
-     * Returns a new Iter with the elements in reverse order
+     * Returns a new Iterable with the elements in reverse order
      * If a reverse iterator is available, it will be used otherwise:
-     *      - reversing an indexed Iter will return a linear (non indexed Iter).
-     *      - reversing a linear Iter will create an indexed Iter by by loading its content into an im-memory array
+     *      - reversing an indexed Iterable will return a linear (non indexed Iter).
+     *      - reversing a linear Iterable will create an indexed Iterable by by loading its content into an im-memory array
      */
     get reverse(): Iter<A> {
         if ( typeof this._value.reverseIterator !== 'undefined' ) {
-            return  new (this.constructor as any)( {
-                                   [Symbol.iterator]: this._value.reverseIterator,
-                                   length:            this._value.length,
-                                   reverseIterator:   this._value[ Symbol.iterator ]
-                               } )
+            return new (this.constructor as any)( {
+                                                      [Symbol.iterator]: this._value.reverseIterator,
+                                                      length:            this._value.length,
+                                                      reverseIterator:   this._value[ Symbol.iterator ]
+                                                  } )
         }
         if ( this.isIndexed ) {
             let index = this.length
@@ -526,11 +551,11 @@ export abstract class Iter<A> implements Iterable<A> {
             }
             return this.build<A>( next )
         }
-        return  new (this.constructor as any)(this.toArray.reverse())
+        return new (this.constructor as any)( this.toArray.reverse() )
     }
 
     // sameElements(that: Iterable<_>): Boolean
-    // Tests if another Iter produces the same values as this one.
+    // Tests if another Iterable produces the same values as this one.
 
     // scanLeft<B>(z: B)(op: (B, A) => B): Iterable<B>
     // Produces a collection containing cumulative results of applying the operator going left to right.
@@ -539,7 +564,7 @@ export abstract class Iter<A> implements Iterable<A> {
     // Produces a collection containing cumulative results of applying the operator going right to left.
 
     /**
-     * The size of this Iter.
+     * The size i.e. the number of elements
      */
     get size(): number {
         //is it already known ?
@@ -555,7 +580,7 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     /**
-     * Creates a Iter returning an interval of the values produced by this Iter.
+     * Creates a Iterable returning an interval of the values produced by this Iter.
      */
     slice( from: number, until: number ): Iter<A> {
         return Array.isArray( this._value ) ?
@@ -565,13 +590,13 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     // sliding<B >: A>(size: number, step: number = 1): GroupedIterable<B>
-    // Returns a Iter which presents a "sliding window" view of another Iter.
+    // Returns a Iterable which presents a "sliding window" view of another Iter.
 
     // span(p: (A) => Boolean): (Iter<A>, Iter<A>)
     // Splits this Iterable into a prefix/suffix pair according to a predicate.
 
     /**
-     * Sums up the elements of this collection.
+     * Sums up the elements
      */
     get sum(): A {
         const first = this.head
@@ -586,7 +611,7 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     /**
-     * Selects first n values of this Iter.
+     * Selects the first n elements
      */
     take( n: number ): Iter<A> {
         const it: Iterator<A> = this[ Symbol.iterator ]()
@@ -606,13 +631,13 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     // takeWhile(p: (A) => Boolean): Iter<A>
-    // Takes longest prefix of values produced by this Iter that satisfy a predicate.
+    // Takes longest prefix of values produced by this Iterable that satisfy a predicate.
 
     // to<Col<_>>: Col<A>
-    // <use case> Converts this Iter into another by copying all elements.
+    // <use case> Converts this Iterable into another by copying all elements.
 
     /**
-     * Converts this Iter to an array.
+     * Converts this Iterable to an array.
      */
     get toArray(): Array<A> {
         return Array.isArray( this._value ) ?
@@ -622,53 +647,53 @@ export abstract class Iter<A> implements Iterable<A> {
     }
 
     // toBuffer<B >: A>: Buffer<B>
-    // Uses the contents of this Iter to create a new mutable buffer.
+    // Uses the contents of this Iterable to create a new mutable buffer.
 
     /**
-     * Converts this Iter to an indexed Iter is it not already one
+     * Converts this Iterable to an indexed Iterable if it not already one
      * by creating an in memory array with the content
      */
     get toIndexed(): Iter<A> {
-        if (this.isIndexed) return this
-        return  new (this.constructor as any)(this.toArray)
+        if ( this.isIndexed ) return this
+        return new (this.constructor as any)( this.toArray )
     }
 
     // toList: List<A>
-    // Converts this Iter to a list.
+    // Converts this Iterable to a list.
 
     // toMap<T, U>: Map<T, U>
-    // <use case> Converts this Iter to a map.
+    // <use case> Converts this Iterable to a map.
 
     // toSet<B >: A>: immutable.Set<B>
-    // Converts this Iter to a set.
+    // Converts this Iterable to a set.
 
     // toStream: immutable.Stream<A>
-    // Converts this Iter to a stream.
+    // Converts this Iterable to a stream.
 
     /**
-     * Converts this Iter to a string.
+     * Converts this Iterable to a string.
      */
     get toString(): string {
         return this.mkString()
     }
 
     // toTraversable: Traversable<A>
-    // Converts this Iter to an unspecified Traversable.
+    // Converts this Iterable to an unspecified Traversable.
 
     // toVector: Vector<A>
-    // Converts this Iter to a Vector.
+    // Converts this Iterable to a Vector.
 
     // withFilter(p: (A) => Boolean): Iter<A>
-    // Creates a Iter over all the elements of this Iter that satisfy the predicate p.
+    // Creates a Iterable over all the elements of this Iterable that satisfy the predicate p.
 
     // zip<B>(that: Iterable<B>): Iterable<(A, B)>
-    // Creates a Iter formed from this Iter and another Iter by combining corresponding values in pairs.
+    // Creates a Iterable formed from this Iterable and another Iterable by combining corresponding values in pairs.
 
     // zipAll<B>(that: Iterable<B>, thisElem: A, thatElem: B): Iterable<(A, B)>
-    // <use case> Creates a Iter formed from this Iter and another Iter by combining corresponding elements in pairs.
+    // <use case> Creates a Iterable formed from this Iterable and another Iterable by combining corresponding elements in pairs.
 
     // zipWithIndex: Iterable<(A, number)>
-    // Creates a Iter that pairs each element produced by this Iter with its index, counting from 0.
+    // Creates a Iterable that pairs each element produced by this Iterable with its index, counting from 0.
 
 }
 
