@@ -115,15 +115,15 @@ export abstract class Option<A> extends Collection<A> {
      * Returns true if this option is empty or the predicate p returns true when applied to this Option's value.
      */
     forall( p: ( value: A ) => boolean ): boolean {
-        return this.isEmpty ? true : p(this.get)
+        return this.isEmpty ? true : p( this.get )
     }
 
     /**
      * Apply the given procedure f to the option's value, if it is nonempty.
      */
     foreach( f: ( value: A ) => void ): void {
-        if (!this.isEmpty) {
-            f(this.get)
+        if ( !this.isEmpty ) {
+            f( this.get )
         }
     }
 
@@ -152,7 +152,10 @@ export abstract class Option<A> extends Collection<A> {
         return this.get
     }
 
-    // headOption: Option<A>
+    get headOption(): Option<A> {
+        return this.orElse( () => none() )
+    }
+
     // Optionally selects the first element.
 
     // init: collection.Seq<A>
@@ -207,11 +210,20 @@ export abstract class Option<A> extends Collection<A> {
     // nonEmpty: boolean
     // Returns false if the option is None, true otherwise.
 
-    // orElse<B >: A>(alternative: => Option<B>): Option<B>
-    // Returns this Option if it is nonempty, otherwise return the result of evaluating alternative.
 
-    // orNull<A1 >: A>(implicit ev: <:<<Null, A1>): A1
-    // Returns the option's value if it is nonempty, or null if it is empty.
+    /**
+     * Returns this Option if it is nonempty, otherwise return the result of evaluating alternative.
+     */
+    orElse( alternative: () => Option<A> ): Option<A> {
+        return this.isEmpty ? alternative() : this
+    }
+
+    /**
+     * Returns the option's value if it is nonempty, or null if it is empty.
+     */
+    get orNull(): A {
+        return this.isEmpty ? null : this.get
+    }
 
     // par: ParSeq<A>
     // Returns a parallel implementation of this collection.
@@ -433,18 +445,6 @@ export abstract class Option<A> extends Collection<A> {
     // }
 
 
-    orElse( alternative: () => Option<A> ): Option<A> {
-        const it: Iterator<A> = this[ Symbol.iterator ]()
-        const n = it.next()
-        if ( n.done ) {
-            return alternative()
-        }
-        return this
-    }
-
-
-
-
     get toPromise(): Promise<A> {
         return this.map( v => Promise.resolve( v ) ).getOrElse( () => Promise.reject( new Error( 'No such element None.get' ) ) )
     }
@@ -453,14 +453,14 @@ export abstract class Option<A> extends Collection<A> {
 
 export class Some<A> extends Option<A> {
 
-    private readonly _optVal : any
+    private readonly _optVal: any
 
     static from<A>( optVal: any ): Some<A> {
         return new Some<A>( optVal )
     }
 
     protected constructor( optVal: any ) {
-        super([optVal])
+        super( [ optVal ] )
         this._optVal = optVal
     }
 
