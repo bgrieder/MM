@@ -152,11 +152,13 @@ export abstract class Option<A> extends Collection<A> {
         return this.get
     }
 
+    /**
+     * Optionally selects the first element.
+     */
     get headOption(): Option<A> {
         return this.orElse( () => none() )
     }
 
-    // Optionally selects the first element.
 
     // init: collection.Seq<A>
     // Selects all elements except the last.
