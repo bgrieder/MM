@@ -94,11 +94,11 @@ describe( 'Seq', function () {
 
     it( 'dropWhile', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).dropWhile( w => w < 3 ).head, 3, "dropWhile failed" )
-        deepEqual( seq<number>( arr ).dropWhile(  w => w < 3 ).size, 7, "dropWhile failed" )
-        deepEqual( seq<number>( arr ).dropWhile(  w => w < 50 ).size, 0, "dropWhile failed" )
+        deepEqual( seq<number>( arr ).dropWhile( w => w < 3 ).size, 7, "dropWhile failed" )
+        deepEqual( seq<number>( arr ).dropWhile( w => w < 50 ).size, 0, "dropWhile failed" )
         deepEqual( seq<number>( iter ).dropWhile( w => w < 3 ).head, 3, "dropWhile failed" )
-        deepEqual( seq<number>( iter ).dropWhile(  w => w < 3 ).size, 7, "dropWhile failed" )
-        deepEqual( seq<number>( iter ).dropWhile(  w => w < 50 ).size, 0, "dropWhile failed" )
+        deepEqual( seq<number>( iter ).dropWhile( w => w < 3 ).size, 7, "dropWhile failed" )
+        deepEqual( seq<number>( iter ).dropWhile( w => w < 50 ).size, 0, "dropWhile failed" )
         done()
     } )
 
@@ -202,6 +202,13 @@ describe( 'Seq', function () {
         done()
     } )
 
+    it( 'headOption', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).headOption.equals( some( 0 ) ), true, "headOption failed" )
+        deepEqual( seq<number>( iter ).headOption.equals( some( 0 ) ), true, "headOption failed" )
+        deepEqual( seq<number>( [] ).headOption.equals( none() ), true, "headOption failed" )
+        done()
+    } )
+
     it( 'indexOf', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).indexOf( 2 ), 2, "indexOf failed" )
         deepEqual( seq<number>( arr ).indexOf( 2, 3 ), -1, "indexOf failed" )
@@ -227,6 +234,19 @@ describe( 'Seq', function () {
     it( 'length', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).length, 10, "length failed" )
         deepEqual( seq<number>( iter ).length, 10, "length failed" )
+        done()
+    } )
+
+    it( 'last', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).last, 9, "last failed" )
+        deepEqual( seq<number>( iter ).last, 9, "last failed" )
+        done()
+    } )
+
+    it( 'lastOption', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).lastOption.equals( some( 9 ) ), true, "lastOption failed" )
+        deepEqual( seq<number>( iter ).lastOption.equals( some( 9 ) ), true, "lastOption failed" )
+        deepEqual( seq<number>( [] ).lastOption.equals( none() ), true, "lastOption failed" )
         done()
     } )
 

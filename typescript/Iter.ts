@@ -383,10 +383,9 @@ export abstract class Collection<A> implements Iterable<A> {
     get head(): A {
         const it: Iterator<A> = this[ Symbol.iterator ]()
         const n = it.next()
-        if ( n.done ) throw new Error( "No such element" )
+        if ( n.done ) throw new Error( "No such element: head" )
         return n.value
     }
-
 
     /**
      * Returns the index of the first occurrence of the specified object in Collection after or at some optional start index.
@@ -407,7 +406,6 @@ export abstract class Collection<A> implements Iterable<A> {
             }
         }
     }
-
 
     // indexWhere(p: (A) => Boolean, from: number): number
     // Returns the index of the first produced value satisfying a predicate, or -1, after or at some start index.
@@ -436,6 +434,29 @@ export abstract class Collection<A> implements Iterable<A> {
 
     // isTraversableAgain: Boolean
     // Tests whether this Collection can be repeatedly traversed.
+
+    /**
+     * Selects the last element.
+     */
+    get last(): A {
+        if (this.isEmpty) {
+            throw new Error('No such element: head')
+        }
+        if (this.isIndexed) {
+            return this.at(this.size-1)
+        }
+        if (typeof this._value.reverseIterator !== 'undefined') {
+            return this._value.reverseIterator().next().value
+        }
+        const it: Iterator<A> = this[ Symbol.iterator ]()
+        let last: A
+        while ( true ) {
+            const n = it.next()
+            if ( n.done ) return last
+            last = n.value
+        }
+    }
+
 
     /**
      * Returns the number of elements

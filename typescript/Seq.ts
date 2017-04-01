@@ -52,6 +52,37 @@ export class Seq<A> extends Collection<A> {
         return none()
     }
 
+    /**
+     * Optionally selects the first element.
+     */
+    get headOption(): Option<A> {
+        try {
+            return some( this.head )
+        }
+        catch ( e ) {
+            return none()
+        }
+    }
+
+
+    // init: collection.Seq<A>
+    // Selects all elements except the last.
+
+    // inits: collection.Iterator<collection.Seq<A>>
+    // Iterates over the inits of this iterable collection.
+
+    /**
+     * Optionally selects the last element.
+     */
+    get lastOption(): Option<A> {
+        try {
+            return some( this.last )
+        }
+        catch ( e ) {
+            return none()
+        }
+    }
+
 }
 
 export function seq<A>( ...vals: any[] ): Seq<A> {

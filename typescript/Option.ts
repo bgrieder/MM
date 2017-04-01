@@ -2,7 +2,7 @@
  * Created by Bruno Grieder.
  */
 import {eq} from './impl/Utils'
-import {Collection, Iterator} from './Iter'
+import {Collection} from './Iter'
 
 
 export abstract class Option<A> extends Collection<A> {
@@ -156,9 +156,8 @@ export abstract class Option<A> extends Collection<A> {
      * Optionally selects the first element.
      */
     get headOption(): Option<A> {
-        return this.orElse( () => none() )
+        return this
     }
-
 
     // init: collection.Seq<A>
     // Selects all elements except the last.
@@ -166,20 +165,34 @@ export abstract class Option<A> extends Collection<A> {
     // inits: collection.Iterator<collection.Seq<A>>
     // Iterates over the inits of this iterable collection.
 
-    // isDefined: boolean
-    // Returns true if the option is an instance of Some, false otherwise.
 
-    // isTraversableAgain: boolean
-    // Tests whether this iterable collection can be repeatedly traversed.
+    /**
+     * Returns true if the option is an instance of Some, false otherwise.
+     */
+    get isDefined(): boolean {
+        return ! this.isEmpty
+    }
+
 
     // iterator: Iterator<A>
     // Returns a singleton iterator returning the Option's value if it is nonempty, or an empty iterator if the option is empty.
 
-    // last: A
-    // Selects the last element.
+    /**
+     * Selects the last element.
+     */
+    get last(): A {
+        if ( this.isEmpty){
+            throw new Error("No such element: last in None")
+        }
+        return this.get
+    }
 
-    // lastOption: Option<A>
-    // Optionally selects the last element.
+    /**
+     * Optionally selects the last element.
+     */
+    get lastOption(): Option<A> {
+        return this
+    }
 
     /**
      * Returns a Some containing the result of applying f to this Option's value if this Option is nonempty.
