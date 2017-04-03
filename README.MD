@@ -78,9 +78,19 @@ function seq<A>( ...values: any[]  ): Seq<A>
  A `Seq` can be created from
 
    - a list of disctrete values e.g. `seq( 1, 2, 3 )`
-   - any `Iterable` including an Array, another `Seq`, an ES6 `Map`, etc... e.g. `seq( [1 ,2, 3])`
+   - any `Iterable` including an Array, a String, another `Seq`, an ES6 `Map`, etc... e.g. `seq( [1 ,2, 3] )`, `seq('abcd')`
 
-  
+
+ Examples:
+
+  ```
+  seq('dlroW olleH').reverse.mkString(' ')    // 'H e l l o   W o r l d'
+
+  seq(1, 2, 'a', 3, 'b', 4).collect( n => !isNaN(n) )( n => n*2 ).mkString('[', ',', ']')    // '[2,4,6,8]'
+
+  seq( seq( [1, 2] ), 3, seq( 4, 5 ) ).flatten().toArray // [ 1, 2, 3, 4, 5 ]
+  ```
+
 Option
 ------
 
