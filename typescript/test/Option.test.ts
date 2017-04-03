@@ -1,22 +1,14 @@
 /**
  * Author: Bruno Grieder
- * Date:   18/05/2015
  */
 
 require( 'source-map-support' ).install()
 import chai = require('chai')
-import * as TestsSetup from './TestsSetup'
-import {list} from '../impl/ListImpl'
+import {seq} from '../Seq'
+import {none, some} from '../Option'
 
-
-const checkFail = TestsSetup.checkFail;
 
 const deepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.deepEqual;
-// let notDeepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.notDeepEqual;
-const ok: ( val: any, msg?: string ) => void = chai.assert.ok;
-
-
-import {none, some} from '../impl/OptionImpl'
 
 
 describe( 'Option', function () {
@@ -29,178 +21,352 @@ describe( 'Option', function () {
         done()
     } )
 
+    // beforeEach( TestsSetup._beforeEach )
+    // afterEach( TestsSetup._afterEach )
 
-    beforeEach( TestsSetup._beforeEach )
-    afterEach( TestsSetup._afterEach )
-
-
-    it( 'should take multiple constructors', ( done: MochaDone ) => checkFail( done, () => {
-
-        const n = none();
-        ok( n.isEmpty(), "None is not empty" )
-        try {
-            n.get()
-            done( new Error( "None has a val" ) )
-        }
-        catch ( e ) {
-        }
-
-        deepEqual( some().get(), undefined, "empty Some can be constructed" )
-        deepEqual( some( 1 ).get(), 1, "Some can be constructed from a single value" )
-        deepEqual( some( some( 1 ) ).get().get(), 1, "Some can contain other Some" )
-    } ) )
-
-
-    it( 'should honor the Option interface', ( done: MochaDone ) => checkFail( done, () => {
-
-        //map
-        deepEqual( some( 2 ).map( ( x ) => x * x ).get(), 4, "Some should map" )
-        ok( none().map( ( x ) => x * x ).isEmpty(), "None should not map" )
-
-        //flatten
-        deepEqual( some( some( 1 ) ).flatten().get(), 1, "some of some should be flattened" )
-        deepEqual( some( none() ).flatten().getOrElse( () => 3 ), 3, "some of none should be flattened to an empty some" ) //really?
-        deepEqual( some( 1 ).flatten().get(), 1, "some of non iterable values should not be flattened" )
-
-        //getOrElse<U>( elseVal: () => U ): A|U
-        deepEqual( some( 1 ).getOrElse( () => 2 ), 1, "getOrElse should get on some" )
-        deepEqual( none().getOrElse( () => 2 ), 2, "getOrElse should else on none" )
-
-        //getOrNull(): A
-        deepEqual( some( 1 ).getOrNull(), 1, "getOrNull should get on some" )
-        deepEqual( none().getOrNull(), null, "getOrNull should return Null on none" )
-
-        //getOrUndefined(): A
-        deepEqual( some( 1 ).getOrUndefined(), 1, "getOrUndefined should get on some" )
-        deepEqual( none().getOrUndefined(), undefined, "getOrUndefined should return undefined on none" )
-
-        //map<U>( f: ( value: A ) => U ): Option<U>
-        deepEqual( some( 1 ).map( ( x ) => x * 3 ).get(), 3, "map should work on some" )
-        ok( none().map( ( x ) => x * 3 ).isEmpty(), "map should not act on None" )
-
-        //fold<U>( ifEmpty: () => U, f: ( value: A ) => U ): U
-        deepEqual( some( 1 ).fold( () => 3, x => x * 3 ), 3, "fold should work on some" )
-        deepEqual( none().fold( () => 5, x => x * 3 ), 5, "fold should work on none" )
-
-        //flatMap<U>( f: ( value: A ) => Option<U> ): Option<U>
-        deepEqual( some( 1 ).flatMap( x => some( x * 3 ) ).get(), 3, "flatMap should work on some" )
-        ok( none().flatMap( x => some( x * 3 ) ).isEmpty(), "flatMap should not act on None" )
-
-        //flatten<U>(): Option<U>
-        deepEqual( some( some( 3 ) ).flatten().get(), 3, "flatten should work on some" )
-        ok( none().flatten().isEmpty(), "flatten should not act on None" )
-
-        //filter( test: ( value: A ) => boolean ): Option<A>
-        deepEqual( some( 3 ).filter( x => x === 3 ).get(), 3, "filter should work on some" )
-        deepEqual( some( 1 ).filter( x => x === 3 ).getOrElse( () => 3 ), 3, "filter should work on some" )
-        ok( none().filter( x => (x === 3) ).isEmpty(), "filter should not act on None" )
-
-        //filterNot( test: ( value: A ) => boolean ): Option<A>
-        deepEqual( some( 3 ).filterNot( x => (x !== 3) ).get(), 3, "filterNot should work on some" )
-        deepEqual( some( 1 ).filterNot( x => (x === 1) ).getOrElse( () => 3 ), 3, "filterNot should work on some" )
-        ok( none().filterNot( x => (x === 3) ).isEmpty(), "filterNot should not act on None" )
-
-        //exists( test: ( value: A ) => boolean ): boolean
-        ok( some( 3 ).exists( x => (x === 3) ), "exist should work on some" )
-        ok( !some( 1 ).exists( x => (x === 3) ), "exist should work on some" )
-        ok( !none().exists( x => (x === 3) ), "exist should not act on None" )
-
-        //forAll( test: ( value: A ) => boolean ): boolean
-        ok( some( 3 ).forAll( x => (x === 3) ), "forAll should work on some" )
-        ok( !some( 1 ).exists( x => (x === 3) ), "forAll should work on some" )
-        ok( none().forAll( x => (x === 3) ), "forAll should return true on None" )
-
-        //forEach<U>( f: ( value: A ) => U )
-        let isRun = false
-        some( 1 ).forEach( x => isRun = (x === 1) )
-        ok( isRun, "forEach should run on Some" )
-
-        isRun = false
-        none().forEach( x => isRun = true )
-        ok( !isRun, "forEach should not act on None" )
-
-        //collect<U>( partialFunction: {someFn?: ( value: A ) => U} ): Option<U>
-        //noinspection JSUnusedGlobalSymbols
-        deepEqual( some( 1 ).collect( { someFn: x => x * 3 } ).get(), 3, "collect should work on some" )
-        ok( some( 1 ).collect( {} ).isEmpty(), "collect should work on some" )
-        ok( none().map( ( x ) => x * 3 ).isEmpty(), "collect should not act on None" )
-
-        //orElse( alternative: () => Option<A> ): Option<A>
-        deepEqual( some( 1 ).orElse( () => some( 5 ) ).get(), 1, "orElse should work on some" )
-        deepEqual( none().orElse( () => some( 5 ) ).get(), 5, "orElse should work on nome" )
-    } ) )
-
-
-    it( 'should work lazily', ( done: MochaDone ) => checkFail( done, () => {
-
-        const l = some( some( 3 ) );
-
-        let mapRun = 0;
-        let filterRun = 0;
-
-        const isOdd = ( x: number ) => {
-            filterRun += 1
-
-            console.log( "filtering " + x + ": " + (x % 2) )
-            return x % 2 !== 0
-        };
-
-        const square = ( x: number ) => {
-            mapRun += 1
-            console.log( "squaring X" )
-            return x * x
-        };
-
-        const lazyRes = l.flatten().filter( isOdd ).map( square );
-
-        deepEqual( filterRun, 0, "filter should not have run" )
-        deepEqual( mapRun, 0, "map should not have run" )
-
-        const res = lazyRes.get();
-
-        deepEqual( res, 9, "should calculate the correct result" )
-        deepEqual( filterRun, 1, "filter should have run" )
-        deepEqual( mapRun, 1, "should have run" )
-    } ) )
-
-
-    it( 'should behave like a gentle Monad', ( done: MochaDone ) => checkFail( done, () => {
-
-        //Monad Laws
-        const f = ( x: any ) => some( x * x );
-        const g = ( x: any ) => some( x + 2 );
-        deepEqual( some( 3 ).flatMap( f ).get(), f( 3 ).get(), "1st Monad Law" )
-        deepEqual( some( 3 ).flatMap( some ).get(), some( 3 ).get(), "2nd Monad Law" )
-        deepEqual( some( 3 ).flatMap( ( x ) => f( x ).flatMap( g ) ).get(), some( 3 ).flatMap( f ).flatMap( g ).get(), "3rd Monad Law" )
-
-        deepEqual( some( list( 1, 2, 2 ) ).flatten().get(), 1, "Some List of vals should be flattened to a a Some of the first val of the List" )
-    } ) )
-
-
-    it( 'should be chainable with async', async () => {
-
-        let b: number = 0
-        try {
-            await some( "Should pass" ).toPromise
-            b = await some( 1 ).toPromise
-        }
-        catch ( e ) {
-            /* ignore */
-        }
-        deepEqual( b, 1, "Await some().toPromise should not throw" )
-
-        b = 0
-        try {
-            await none().toPromise
-            b = await some( 1 ).toPromise
-        }
-        catch ( e ) {
-            /* ignore */
-        }
-        deepEqual( b, 0, "Await none().toPromise should throw" )
-
+    it( 'collect', ( done: MochaDone ) => {
+        deepEqual( none().collect<number>( v => v % 2 === 0 )( v => v * 2 ).toArray, [], "collect failed" )
+        deepEqual( some( 2 ).collect<number>( v => v % 2 === 0 )( v => v * 2 ).toArray, [ 4 ], "collect failed" )
+        done()
     } )
 
+    it( 'collectFirst', ( done: MochaDone ) => {
+        deepEqual( none().collectFirst( x => x === 3 )( x => x * 2 ).equals( none() ), true, "collectFirst failed" )
+        deepEqual( some( 2 ).collectFirst( x => x === 2 )( x => x * 3 ).equals( some( 6 ) ), true, "collectFirst failed" )
+        deepEqual( some( 2 ).collectFirst( x => x === 13 )( x => x * 3 ).equals( none() ), true, "collectFirst failed" )
+        done()
+    } )
+
+    it( 'concat', ( done: MochaDone ) => {
+        deepEqual( some( 2 ).concat( some( 3 ) ).toArray, [ 2, 3 ], "concat failed" )
+        deepEqual( some( 2 ).concat( none() ).toArray, [ 2 ], "concat failed" )
+        deepEqual( none().concat( some( 3 ) ).toArray, [ 3 ], "concat failed" )
+        deepEqual( none().concat( none() ).toArray, [], "concat failed" )
+        done()
+    } )
+
+    it( 'contains', ( done: MochaDone ) => {
+        deepEqual( none().contains( 2 ), false, "contains failed" )
+        deepEqual( some( 2 ).contains( 2 ), true, "contains failed" )
+        deepEqual( some( 2 ).contains( 10 ), false, "contains failed" )
+        done()
+    } )
+
+    it( 'count', ( done: MochaDone ) => {
+        deepEqual( none().count( v => v % 2 === 0 ), 0, "count failed" )
+        deepEqual( some( 2 ).count( v => v % 2 === 0 ), 1, "count failed" )
+        deepEqual( some( 2 ).count( v => v % 3 === 0 ), 0, "count failed" )
+        done()
+    } )
+
+    it( 'drop', ( done: MochaDone ) => {
+        deepEqual( none().drop( 3 ).isEmpty, true, "drop failed" )
+        deepEqual( none().drop( 3 ).size, 0, "drop failed" )
+        deepEqual( some( 2 ).drop( 1 ).size, 0, "drop failed" )
+        done()
+    } )
+
+    it( 'dropWhile', ( done: MochaDone ) => {
+        deepEqual( none().dropWhile( w => w < 3 ).isEmpty, true, "dropWhile failed" )
+        deepEqual( some( 2 ).dropWhile( w => w < 3 ).isEmpty, true, "dropWhile failed" )
+        deepEqual( some( 2 ).dropWhile( w => w > 50 ).isEmpty, false, "dropWhile failed" )
+        done()
+    } )
+
+    it( 'equals', ( done: MochaDone ) => {
+        const a1 = seq( [ 1, 2, 3 ] )
+        deepEqual( some( 2 ).equals( some( 2 ) ), true, "equals failed" )
+        deepEqual( some( 2 ).equals( none() ), false, "equals failed" )
+        deepEqual( none().equals( none() ), true, "equals failed" )
+        deepEqual( none().equals( some( 2 ) ), false, "equals failed" )
+        deepEqual( seq( 2 ).equals( some( 2 ) ), true, "equals failed" )
+        done()
+    } )
+
+    it( 'exists', ( done: MochaDone ) => {
+        deepEqual( none().exists( v => v === 3 ), false, "exists failed" )
+        deepEqual( some( 2 ).exists( v => v === 2 ), true, "exists failed" )
+        deepEqual( some( 2 ).exists( v => v === 10 ), false, "exists failed" )
+        done()
+    } )
+
+    it( 'filter', ( done: MochaDone ) => {
+        deepEqual( none().filter( v => v % 2 === 0 ).equals( none() ), true, "filter failed" )
+        deepEqual( some( 2 ).filter( v => v % 2 === 0 ).equals( some( 2 ) ), true, "filter failed" )
+        deepEqual( some( 2 ).filter( v => v % 2 === 1 ).equals( none() ), true, "filter failed" )
+        done()
+    } )
+
+    it( 'filterNot', ( done: MochaDone ) => {
+        deepEqual( none().filterNot( v => v % 2 === 0 ).equals( none() ), true, "filterNot failed" )
+        deepEqual( some( 2 ).filterNot( v => v % 2 === 0 ).equals( none() ), true, "filterNot failed" )
+        deepEqual( some( 2 ).filterNot( v => v % 2 === 1 ).equals( some( 2 ) ), true, "filterNot failed" )
+        done()
+    } )
+
+    it( 'flatten', ( done: MochaDone ) => {
+        deepEqual( none().flatten().equals( none() ), true, "flatten failed" )
+        deepEqual( some( none() ).flatten().equals( none() ), true, "flatten failed" )
+        deepEqual( some( some( 3 ) ).flatten().equals( some( 3 ) ), true, "flatten failed" )
+        done()
+    } )
+
+    it( 'flatMap', ( done: MochaDone ) => {
+        deepEqual( none().flatMap( ( v: number ) => some( v * 2 ) ).isEmpty, true, "flatMap failed" )
+        deepEqual( some( 2 ).flatMap( ( v: number ) => some( v * 2 ) ).get, 4, "flatMap failed" )
+        deepEqual( some( 2 ).flatMap( ( v: number ) => some( v * 2 ) ).equals( some( 4 ) ), true, "flatMap failed" )
+        done()
+    } )
+
+    it( 'find', ( done: MochaDone ) => {
+        deepEqual( none().find( x => x === 3 ).equals( none() ), true, "find failed" )
+        deepEqual( some( 2 ).find( x => x === 2 ).equals( some( 2 ) ), true, "find failed" )
+        deepEqual( some( 2 ).find( x => x === 13 ).equals( none() ), true, "find failed" )
+        done()
+    } )
+
+    it( 'foldLeft', ( done: MochaDone ) => {
+        deepEqual( none().foldLeft( 1 )( ( acc, v ) => acc + v ), 1, "foldLeft failed" )
+        deepEqual( some( 2 ).foldLeft( 1 )( ( acc, v ) => acc + v ), 3, "foldLeft failed" )
+        done()
+    } )
+
+    it( 'foldRight', ( done: MochaDone ) => {
+        deepEqual( none().foldRight( 1 )( ( acc, v ) => acc + v ), 1, "foldRight failed" )
+        deepEqual( some( 2 ).foldRight( 1 )( ( acc, v ) => acc + v ), 3, "foldRight failed" )
+        done()
+    } )
+
+    it( 'forall', ( done: MochaDone ) => {
+        deepEqual( none().forall( v => v < 50 ), true, "forall failed" )
+        deepEqual( some( 2 ).forall( v => v > 50 ), false, "forall failed" )
+        deepEqual( some( 2 ).forall( v => v < 3 ), true, "forall failed" )
+        done()
+    } )
+
+    it( 'foreach', ( done: MochaDone ) => {
+
+        let count = 0
+        const f = ( value: number ): void => {
+            count = count + value
+        }
+
+        count = 0
+        none().foreach( f )
+        deepEqual( count, 0, "foreach failed" )
+
+        count = 0
+        some( 2 ).foreach( f )
+        deepEqual( count, 2, "foreach failed" )
+        done()
+    } )
+
+    it( 'get', ( done: MochaDone ) => {
+        try {
+            none().get
+            return done( new Error( "get Failed" ) )
+        }
+        catch ( e ) { /* ignore */}
+        deepEqual( some( 2 ).get, 2, "get failed" )
+        done()
+    } )
+
+    it( 'getOrElse', ( done: MochaDone ) => {
+        deepEqual( none().getOrElse( () => 3 ), 3, "getOrElse failed" )
+        deepEqual( some( 2 ).getOrElse( () => 3 ), 2, "getOrElse failed" )
+        done()
+    } )
+
+    it( 'hasDefiniteSize', ( done: MochaDone ) => {
+        deepEqual( none().hasDefiniteSize, true, "hasDefiniteSize failed" )
+        deepEqual( some( 2 ).hasDefiniteSize, true, "hasDefiniteSize failed" )
+        done()
+    } )
+
+    it( 'head', ( done: MochaDone ) => {
+        try {
+            none().head
+            return done( new Error( "head Failed" ) )
+        }
+        catch ( e ) { /* ignore */}
+        deepEqual( some( 2 ).head, 2, "head failed" )
+        done()
+    } )
+
+    it( 'headOption', ( done: MochaDone ) => {
+        deepEqual( none().headOption.equals( none() ), true, "headOption failed" )
+        deepEqual( some( 2 ).headOption.equals( some( 2 ) ), true, "headOption failed" )
+        done()
+    } )
+
+    it( 'indexOf', ( done: MochaDone ) => {
+        deepEqual( none().indexOf( 2 ), -1, "indexOf failed" )
+        deepEqual( some( 2 ).indexOf( 2 ), 0, "indexOf failed" )
+        deepEqual( some( 2 ).indexOf( 3 ), -1, "indexOf failed" )
+        done()
+    } )
+
+    it( 'isDefined', ( done: MochaDone ) => {
+        deepEqual( none().isDefined, false, "isDefined failed" )
+        deepEqual( some( 2 ).isDefined, true, "isDefined failed" )
+        done()
+    } )
+
+    it( 'isEmpty', ( done: MochaDone ) => {
+        deepEqual( none().isEmpty, true, "isEmpty failed" )
+        deepEqual( some( 2 ).isEmpty, false, "isEmpty failed" )
+        done()
+    } )
+
+    it( 'isIndexed', ( done: MochaDone ) => {
+        deepEqual( none().isIndexed, true, "isIndexed failed" )
+        deepEqual( some( 2 ).isIndexed, true, "isIndexed failed" )
+        done()
+    } )
+
+    it( 'length', ( done: MochaDone ) => {
+        deepEqual( none().length, 0, "length failed" )
+        deepEqual( some( 2 ).length, 1, "length failed" )
+        done()
+    } )
+
+    it( 'last', ( done: MochaDone ) => {
+        try {
+            none().last
+            return done( new Error( "last Failed" ) )
+        }
+        catch ( e ) { /* ignore */}
+        deepEqual( some( 2 ).last, 2, "last failed" )
+        done()
+    } )
+
+    it( 'lastOption', ( done: MochaDone ) => {
+        deepEqual( none().lastOption.equals( none() ), true, "lastOption failed" )
+        deepEqual( some( 2 ).lastOption.equals( some( 2 ) ), true, "lastOption failed" )
+        done()
+    } )
+
+    it( 'map', ( done: MochaDone ) => {
+        deepEqual( none().map( v => v * 2 ).equals( none() ), true, "map failed" )
+        deepEqual( some( 2 ).map( v => v * 2 ).equals( some( 4 ) ), true, "map failed" )
+        done()
+    } )
+
+    it( 'mkString', ( done: MochaDone ) => {
+        deepEqual( none().mkString(), "", "mkString failed" )
+        deepEqual( some( 2 ).mkString(), "2", "mkString failed" )
+        done()
+    } )
+
+    it( 'nonEmpty', ( done: MochaDone ) => {
+        deepEqual( none().nonEmpty, false, "nonEmpty failed" )
+        deepEqual( some( 2 ).nonEmpty, true, "nonEmpty failed" )
+        done()
+    } )
+
+    it( 'orElse', ( done: MochaDone ) => {
+        deepEqual( none().orElse( () => some( 3 ) ).equals( some( 3 ) ), true, "orElse failed" )
+        deepEqual( some( 2 ).orElse( () => some( 3 ) ).equals( some( 2 ) ), true, "orElse failed" )
+        done()
+    } )
+
+    it( 'orNull', ( done: MochaDone ) => {
+        deepEqual( none().orNull, null, "orNull failed" )
+        deepEqual( some( 2 ).orNull, 2, "orNull failed" )
+        done()
+    } )
+
+    it( 'orUndefined', ( done: MochaDone ) => {
+        deepEqual( none().orUndefined, void 0, "orUndefined failed" )
+        deepEqual( some( 2 ).orUndefined, 2, "orUndefined failed" )
+        done()
+    } )
+
+    it( 'reverse', ( done: MochaDone ) => {
+        deepEqual( some( 2 ).reverse.toArray, [ 2 ], "reverse failed" )
+        deepEqual( none().reverse.toArray, [], "reverse failed" )
+        done()
+    } )
+
+    it( 'slice', ( done: MochaDone ) => {
+        deepEqual( none().slice( 2, 5 ).toArray, [], "slice failed" )
+        deepEqual( some( 2 ).slice( 0, 1 ).toArray, [ 2 ], "slice failed" )
+        deepEqual( some( 2 ).slice( 2, 5 ).toArray, [], "slice failed" )
+        done()
+    } )
+
+    it( 'size', ( done: MochaDone ) => {
+        deepEqual( none().size, 0, "size failed" )
+        deepEqual( some( 2 ).size, 1, "size failed" )
+        done()
+    } )
+
+    it( 'sum', ( done: MochaDone ) => {
+        try {
+            none().sum
+            return done( new Error( "sum Failed" ) )
+        }
+        catch ( e ) { /* ignore */}
+        deepEqual( some( 2 ).sum, 2, "sum failed" )
+        done()
+    } )
+
+    it( 'tail', ( done: MochaDone ) => {
+        deepEqual( none().tail.toArray, [], "tail failed" )
+        deepEqual( some( 2 ).tail.toArray, [], "tail failed" )
+        done()
+    } )
+
+    it( 'take', ( done: MochaDone ) => {
+        deepEqual( none().take( 3 ).toArray, [], "take failed" )
+        deepEqual( some( 2 ).take( 3 ).toArray, [ 2 ], "take failed" )
+        done()
+    } )
+
+    it( 'toIndexed', ( done: MochaDone ) => {
+        deepEqual( none().toIndexed.isIndexed, true, "toIndexed failed" )
+        deepEqual( some( 2 ).toIndexed.isIndexed, true, "toIndexed failed" )
+        done()
+    } )
+
+    it( 'toString', ( done: MochaDone ) => {
+        deepEqual( none().toString, "", "toString failed" )
+        deepEqual( some( 2 ).toString, "2", "toString failed" )
+        done()
+    } )
+
+    it( 'should be a monad', ( done: MochaDone ) => {
+        //Monad Laws
+        const f = ( x: number ) => seq( [ x * x ] );
+        const g = ( x: number ) => seq( [ x + 2 ] );
+        deepEqual( seq( [ 3 ] ).flatMap( f ).toArray, f( 3 ).toArray, "1st Monad Law" )
+        deepEqual( seq( [ 1, 2, 3 ] ).flatMap( ( x: number ) => seq( [ x ] ) ).toArray, seq( [ 1, 2, 3 ] ).toArray, "2nd Monad Law" )
+        deepEqual( seq( [ 1, 2, 3 ] ).flatMap( ( x: number ) => f( x ).flatMap( g ) ).toArray, seq( [ 1, 2, 3 ] ).flatMap( f ).flatMap( g ).toArray, "3rd Monad Law" )
+        done()
+    } )
+
+    it( 'should be lazy', ( done: MochaDone ) => {
+
+        let count = 0
+        const f = ( value: number ): boolean => {
+            count = count + 1
+            return value < 3
+        }
+
+        count = 0
+        none().filter( f ).take( 3 ).toArray
+        deepEqual( count, 0, "lazy failed" )
+
+        count = 0
+        some( 2 ).filter( f ).take( 3 )
+        deepEqual( count, 0, "lazy failed" )
+
+        count = 0
+        some( 2 ).filter( f ).take( 3 ).toArray
+        deepEqual( count, 1, "lazy failed" )
+
+        done()
+    } )
 } )
 
 

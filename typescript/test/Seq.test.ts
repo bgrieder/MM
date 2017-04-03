@@ -6,13 +6,10 @@ require( 'source-map-support' ).install()
 import chai = require('chai')
 import {Iterable, Iterator} from '../Iter'
 import {seq} from '../Seq'
-import {none, some} from '../Option'
+import {none, option, some} from '../Option'
 
 
 const deepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.deepEqual;
-// let notDeepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.notDeepEqual;
-// const ok: ( val: any, msg?: string ) => void = chai.assert.ok;
-
 
 const iter: Iterable<number> = {
     [Symbol.iterator]: (): Iterator<number> => {
@@ -132,7 +129,7 @@ describe( 'Seq', function () {
     } )
 
     it( 'flatten', ( done: MochaDone ) => {
-        const a1 = seq( [ seq( [ 0, 1 ] ), seq( [ 2, 3 ] ), 4, seq( [ 5, 6 ] ) ] )
+        const a1 = option( [ option( [ 0, 1 ] ), option( [ 2, 3 ] ), 4, option( [ 5, 6 ] ) ] )
         deepEqual( a1.flatten().toArray, [ 0, 1, 2, 3, 4, 5, 6 ], "flatten failed" )
         deepEqual( seq<number>( [ seq<number>( iter ), seq<number>( iter ) ] ).flatten().toArray, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ], "flatten failed" )
         done()
@@ -268,6 +265,14 @@ describe( 'Seq', function () {
         done()
     } )
 
+    it( 'nonEmpty', ( done: MochaDone ) => {
+        deepEqual( seq<number>( arr ).nonEmpty, true, "nonEmpty failed" )
+        deepEqual( seq<number>( [] ).nonEmpty, false, "nonEmpty failed" )
+        deepEqual( seq<number>( iter ).nonEmpty, true, "nonEmpty failed" )
+        done()
+    } )
+
+
     it( 'reverse', ( done: MochaDone ) => {
         deepEqual( seq<number>( iter ).reverse.toArray, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ].reverse(), "reverse failed" )
         deepEqual( seq<number>( arr ).reverse.toArray, [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ].reverse(), "reverse failed" )
@@ -276,6 +281,7 @@ describe( 'Seq', function () {
 
     it( 'slice', ( done: MochaDone ) => {
         deepEqual( seq<number>( arr ).slice( 2, 5 ).toArray, [ 2, 3, 4 ], "slice failed" )
+        deepEqual( seq<number>( arr ).slice( 12, 15 ).toArray, [ ], "slice failed" )
         deepEqual( seq<number>( iter ).slice( 2, 5 ).toArray, [ 2, 3, 4 ], "slice failed" )
         done()
     } )
@@ -366,8 +372,6 @@ describe( 'Seq', function () {
         deepEqual( seq( "abcd" ).toArray, [ 'a', 'b', 'c', 'd' ], "seq from string failed" )
         done()
     } )
-
-
 } )
 
 

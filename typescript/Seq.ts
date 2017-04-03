@@ -1,8 +1,9 @@
 /**
  * Created by Bruno Grieder.
  */
-import {Collection, Iterator} from './Iter'
+import {Iterator} from './Iter'
 import {none, Option, some} from './Option'
+import {Collection} from './Collection'
 
 
 /**
@@ -18,9 +19,6 @@ export class Seq<A> extends Collection<A> {
             return new Seq<A>( vals )
         }
         const value = vals[ 0 ]
-        if ( value instanceof Seq ) {
-            return value
-        }
         if ( typeof value[ Symbol.iterator ] === 'undefined' ) {
             return new Seq<A>( [ value ] )
         }
@@ -33,7 +31,7 @@ export class Seq<A> extends Collection<A> {
     collectFirst<B>( filter: ( value: A ) => boolean ): ( mapper: ( value: A ) => B ) => Option<B> {
         return ( mapper: ( value: A ) => B ) => {
             try {
-                return some( this.filter( filter ).map( mapper ).head )
+                return some<B>( this.filter( filter ).map( mapper ).head )
             }
             catch ( e ) {
                 return none()
