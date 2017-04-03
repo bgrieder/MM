@@ -33,15 +33,15 @@ const value = option(input).map(calculateFromInput).getOrElse(getDefaultValue)
 **Write lazy evaluated code**
   
 ```
-alist(hugeArray).dropAt(2).map(expensiveOp).takeFirst(3)
+seq(hugeArray).drop(2).map(expensiveOp).takeFirst(3)
   
 ```
-is not evaluated (iterated) until `toArray` is called on it, and when it is, only five iterations and 3 calls to `map` are performed 
+is not evaluated (iterated) until `toArray` is called on it, and when it is, only five iterations on the Seq and 3 calls to `map` are performed
   
 Usage
 -----
 
-*Typescript / ES6*: `import { some, list, .. } from 'm.m'`
+*Typescript / ES6*: `import { some, seq, .. } from 'm.m'`
 
 *ES5* `const MM = require('m.m')`
 
@@ -53,12 +53,12 @@ MIT
 TODO, Contributing, etc..
 --------------------------
 
-Most Wanted: [enrich](./SeqAdditional.MD) `Seq`, `List` unit tests, `Range`, `Future`, `Try`,... 
+Most Wanted: `Try`, `Range`, `Try`,...
 
 I work on this library sporadically.
 
 You are most welcome to contribute by opening new Pull Requests.
-For new Monads, please get inspiration from the Scala definitions and try extending `Seq`
+For new Monads, please get inspiration from the Scala definitions and extend `Collection` for the implementation
 
   
 API
@@ -66,81 +66,49 @@ API
   
 Seq
 ---
-
-A Seq is an ordered sequence of values that are expected to be traversed in one direction or both. 
-
-```
-/**
-/**
- * Create a Seq from one or two iterators and optionally specify its length
- */
-function seq<A>( fit?: () => Iterator<A>, bit?: () =>Iterator<A>, length?: number ): Seq<A>
- 
-/**
-* Create a seq from a list of values
-*/
-function aseq<A>( ...vals: A[] ): Seq<A> 
-
-
-/**
- * Create a Seq from an Iterable
- */
-function fseq<A>( it: Iterable<A> ): Seq<A> 
+A Seq is an ordered sequence of values
 
 ```
-[Seq Interface](./typescript/API/Seq.ts) 
-
-List
-----
-
-A List is a Seq that is expected to be traversed in the two directions.
-
+/**
+ * Create a Seq
+ */
+function seq<A>( ...values: any[]  ): Seq<A>
 ```
 
-/**
- * Create a list from rest parameters
- */
-function list<A>( ...vals: A[] ): List<A>
+ A `Seq` can be created from
 
-/**
- * Create a list from an array
- */
-function alist<A>( array: A[] ): List<A> 
+   - a list of disctrete values e.g. `seq( 1, 2, 3 )`
+   - any `Iterable` including an Array, another `Seq`, an ES6 `Map`, etc... e.g. `seq( [1 ,2, 3])`
 
-/**
- * Create a list from an iterable
- */
-function flist<A>( it: Iterable<A> ): List<A> 
-
-```
-[List Interface](./typescript/API/List.ts) 
   
 Option
 ------
 
-```
-/**
- * Create a `None` if `value` is `undefined` or `null`
- * otherwise create a `Some` holding that value
- */
-function option<A>(value?: A): Option<A> 
-
-/**
- * Create a `Some` holding the value
- */
-function some<A>( value?: A ): Some<A>
-
-/**
- * Create a `Some` from an `Iterable`
- */
-function fsome<A>( it: Iterable<A> ): Some<A>
-
-/**
- * Creates a `None`
- */
-function none(): None 
+Represents optional values.
 
 ```
 
-[Option Interface](./typescript/API/Option.ts) 
+/**
+ * Creates a None, i.e. an empty option
+ */
+function none(): Option<A>
 
+/**
+ * Create a `Some` i.e. an Option holding a value
+ */
+function some<A>( value?: A ): Option<A>
+
+/**
+ * Create a None if value is undefined or null
+ * otherwise create a Some holding that value
+ */
+function option<A>(value?: A): Option<A>
+```
+
+The most idiomatic way to use an Option is to treat it as a collection or monad and use `map`, `flatMap`, `filter`, or `foreach`:
+
+```
+const name: Option<string> = option(request.getParameter('name'))
+const upper = name.map( n => n.trim() ).filter( n => n.length !== 0 ).map( n => n.toUpperCase() )
+console.log(upper.getOrElse( () =>  "" ) )
+```

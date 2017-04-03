@@ -1,7 +1,7 @@
 /**
  * Created by Bruno Grieder.
  */
-import {eq} from './impl/Utils'
+import {eq} from './Utils'
 import {Iterable, Iterator} from './Iter'
 
 
