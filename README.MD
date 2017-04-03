@@ -53,7 +53,7 @@ MIT
 TODO, Contributing, etc..
 --------------------------
 
-Most Wanted: `Try`, `Range`, `Try`,...
+Most Wanted: `Try`, `Range`, `Either`,...
 
 I work on this library sporadically.
 
