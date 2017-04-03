@@ -89,12 +89,12 @@ Represents optional values.
 ```
 
 /**
- * Creates a None, i.e. an empty option
+ * Creates a None, i.e. an empty Option
  */
 function none(): Option<A>
 
 /**
- * Create a `Some` i.e. an Option holding a value
+ * Create a Some i.e. an Option holding a value
  */
 function some<A>( value?: A ): Option<A>
 
@@ -108,7 +108,7 @@ function option<A>(value?: A): Option<A>
 The most idiomatic way to use an Option is to treat it as a collection or monad and use `map`, `flatMap`, `filter`, or `foreach`:
 
 ```
-const name: Option<string> = option(request.getParameter('name'))
+const name = option( request.getParameter('name') )
 const upper = name.map( n => n.trim() ).filter( n => n.length !== 0 ).map( n => n.toUpperCase() )
 console.log(upper.getOrElse( () =>  "" ) )
 ```
