@@ -14,7 +14,7 @@ A small library that implements a few useful Monads for functional programming.
  
  Instead of 
  
- ```
+ ```javascript
  let value;
  if (typeof input === 'undefined' || input === null) {
      value = getDefaultValue()
@@ -26,7 +26,7 @@ A small library that implements a few useful Monads for functional programming.
 
 write
 
-```
+```javascript
 const value = option(input).map(calculateFromInput).getOrElse(getDefaultValue) 
 ```
   
@@ -60,7 +60,7 @@ I work on this library sporadically.
 You are most welcome to contribute by opening new Pull Requests.
 For new Monads, please get inspiration from the Scala definitions and extend `Collection` for the implementation
 
-  
+
 API
 ===
   
@@ -68,7 +68,7 @@ Seq
 ---
 A Seq is an ordered sequence of values
 
-```
+```typescript
 /**
  * Create a Seq
  */
@@ -83,7 +83,7 @@ function seq<A>( ...values: any[]  ): Seq<A>
 
  Examples:
 
-  ```
+  ```typescript
   seq('dlroW olleH').reverse.mkString(' ')    // 'H e l l o   W o r l d'
 
   seq(1, 2, 'a', 3, 'b', 4).collect( n => !isNaN(n) )( n => n*2 ).mkString('[', ',', ']')    // '[2,4,6,8]'
@@ -96,7 +96,7 @@ Option
 
 Represents optional values.
 
-```
+```typescript
 
 /**
  * Creates a None, i.e. an empty Option
@@ -117,7 +117,7 @@ function option<A>(value?: A): Option<A>
 
 The most idiomatic way to use an Option is to treat it as a collection or monad and use `map`, `flatMap`, `filter`, or `foreach`:
 
-```
+```typescript
 const name = option( request.getParameter('name') )
 const upper = name.map( n => n.trim() ).filter( n => n.length !== 0 ).map( n => n.toUpperCase() )
 console.log(upper.getOrElse( () =>  "" ) )
