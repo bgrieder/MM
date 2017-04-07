@@ -329,6 +329,11 @@ describe( 'Option', function () {
         done()
     } )
 
+    it( 'toPromise', async ( done: MochaDone ) => {
+        deepEqual( await none().toPromise.catch( () => 2 ), 2, "toPromise failed" )
+        deepEqual( await some( 2 ).toPromise, 2, "toPromise failed" )
+    } )
+
     it( 'toString', ( done: MochaDone ) => {
         deepEqual( none().toString, "", "toString failed" )
         deepEqual( some( 2 ).toString, "2", "toString failed" )
