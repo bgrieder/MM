@@ -32,7 +32,7 @@ const value = option(input).map(calculateFromInput).getOrElse(getDefaultValue)
   
 **Write lazy evaluated code**
   
-```
+```javascript
 seq(hugeArray).drop(2).map(expensiveOp).takeFirst(3)
   
 ```

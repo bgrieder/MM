@@ -266,7 +266,7 @@ export function none() {
 }
 
 
-export function option<A>( value: A ): Option<A> {
+export function option<A>( value: A | Iterable<A> ): Option<A> {
     return (typeof value === 'undefined' || value === null) ? Option.from<A>( [] ) : Option.from<A>( value )
 }
 
