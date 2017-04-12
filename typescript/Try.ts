@@ -48,12 +48,12 @@ export class Try<A> {
         return res as A
     }
 
-
-//     canEqual(that: Any): Boolean
-//     A method that should be called from every well-designed equals method that is open to be overridden in a subclass.
-
-//     collect[U](pf: PartialFunction[T, U]): Try[U]
-//     Applies the given partial function to the value from this Success or returns this if this is a Failure.
+    /**
+     * Applies the given mapper to this computation if it is a Success and the filter is satisfied
+     */
+    collect<B>( filter: () => boolean ): ( mapper: ( value: A ) => B ) => Try<B> {
+        return ( mapper: ( value: A ) => B ) => this.filter(filter).map(mapper)
+    }
 
     /**
      * Inverts this Try.
@@ -76,7 +76,7 @@ export class Try<A> {
             if ( f() ) {
                 return computeThrow()
             }
-            throw new Error( "Filter failed" )
+            throw new Error( "Filter not statisfied" )
         } )
     }
 
@@ -103,9 +103,16 @@ export class Try<A> {
         } )
     }
 
-
-//     fold[U](fa: (Throwable) ⇒ U, fb: (T) ⇒ U): U
-//     Applies fa if this is a Failure or fb if this is a Success.
+    /**
+     * Applies ffailure if this is a Failure or fsuccess if this is a Success.
+     */
+    fold<U>( ffailure: ( e: Error ) => U, fsuccess: ( vale: A ) => U ): U {
+        const res = this.compute()
+        if ( this._failed ) {
+            return ffailure( res as Error )
+        }
+        return fsuccess( res as A )
+    }
 
     /**
      * Applies the given function f if this is a Success, otherwise returns Unit if this is a Failure.
@@ -178,13 +185,6 @@ export class Try<A> {
         } )
     }
 
-//     productArity: Int
-//     The size of this product.
-
-//     productElement(n: Int): Any
-//     The nth element of this product, 0-based.
-
-
     /**
      * Applies the given function f if this is a Failure, otherwise returns this if this is a Success.
      */
@@ -192,9 +192,9 @@ export class Try<A> {
         return new Try<A | U>( () => {
             const res = this.compute()
             if ( this._failed ) {
-                return fn( res as any as Error )
+                return fn( res as Error )
             }
-            return res as any as U
+            return res as A
         } )
     }
 
@@ -235,15 +235,25 @@ export class Try<A> {
         return option<A>( iter )
     }
 
-//     toOption: Option[T]
-//
+    /**
+     * Converts this Try to a Promise, resolving it if it is a Success, rejecting it otherwise
+     */
+    get toPromise(): Promise<A> {
+        return this.map( v => Promise.resolve( v ) ).getOrElse( () => Promise.reject( new Error( 'No such element None.get' ) ) )
+    }
 
-//     transform[U](s: (T) ⇒ Try[U], f: (Throwable) ⇒ Try[U]): Try[U]
-//     Completes this Try by applying the function f to this if this is of type Failure, or conversely, by applying s if this is a Success.
-
-
+    /**
+     * Transforms this Try by applying the function ffailure if this is a Failure, or conversely, by applying fsuccess if this is a Success.
+     */
+    transform<U>( ffailure: ( e: Error ) => Try<U>, fsuccess: ( vale: A ) => Try<U> ): Try<U> {
+        return new Try<Try<U>>( () => this.fold<Try<U>>( ffailure, fsuccess ) ).flatten<U>()
+    }
 }
 
-export function tri<A>( fn: ( ...args: any[] ) => A ): Try<A> {
-    return Try.from<A>( fn )
+
+/**
+ * Wraps this computation in a Try
+ */
+export function tri<A>( computation: ( ) => A ): Try<A> {
+    return Try.from<A>( computation )
 }

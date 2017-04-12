@@ -184,6 +184,18 @@ export class Option<A> extends Collection<A> {
     }
 
     /**
+     * Returns the option's value if it is nonempty, or throws an error with the specified message
+     */
+    orThrow(message: () => string): A {
+        try {
+            return this.get
+        }
+        catch ( e ) {
+            throw new Error(message())
+        }
+    }
+
+    /**
      * Returns the option's value if it is nonempty, or undefined if it is empty.
      */
     get orUndefined(): A {
@@ -265,8 +277,12 @@ export function none() {
     return Option.from<any>( [] )
 }
 
-
+/**
+ * Create a None if value is undefined or null or NaN
+ * otherwise create a Some holding that value
+ */
 export function option<A>( value: A | Iterable<A> ): Option<A> {
-    return (typeof value === 'undefined' || value === null) ? Option.from<A>( [] ) : Option.from<A>( value )
+    //note: NaN is the only value that does not equal itself  (isNan() will attempt to convert to a number first)
+    return (typeof value === 'undefined' || value === null || value !== value) ? Option.from<A>( [] ) : Option.from<A>( value )
 }
 

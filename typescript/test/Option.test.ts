@@ -5,7 +5,7 @@
 require( 'source-map-support' ).install()
 import chai = require('chai')
 import {seq} from '../Seq'
-import {none, some} from '../Option'
+import {none, option, some} from '../Option'
 
 
 const deepEqual: ( act: any, exp: any, msg?: string ) => void = chai.assert.deepEqual;
@@ -276,6 +276,18 @@ describe( 'Option', function () {
         done()
     } )
 
+    it( 'orThrow', ( done: MochaDone ) => {
+        try {
+            none().orThrow( () => "OK" )
+            return done( new Error( "orThrow Failed" ) )
+        }
+        catch ( e ) {
+            deepEqual( e.message, "OK", "orNull failed" )
+        }
+        deepEqual( some( 2 ).orThrow( () => "Not OK" ), 2, "orThrow failed" )
+        done()
+    } )
+
     it( 'orUndefined', ( done: MochaDone ) => {
         deepEqual( none().orUndefined, void 0, "orUndefined failed" )
         deepEqual( some( 2 ).orUndefined, 2, "orUndefined failed" )
@@ -329,7 +341,7 @@ describe( 'Option', function () {
         done()
     } )
 
-    it( 'toPromise', async ( ) => {
+    it( 'toPromise', async () => {
         deepEqual( await none().toPromise.catch( () => 2 ), 2, "toPromise failed" )
         deepEqual( await some( 2 ).toPromise, 2, "toPromise failed" )
     } )
@@ -370,6 +382,14 @@ describe( 'Option', function () {
         some( 2 ).filter( f ).take( 3 ).toArray
         deepEqual( count, 1, "lazy failed" )
 
+        done()
+    } )
+
+    it( 'option', ( done: MochaDone ) => {
+        deepEqual( option( null ).isEmpty, true, "option failed" )
+        deepEqual( option( void 0 ).isEmpty, true, "option failed" )
+        deepEqual( option( parseInt( "blah" ) ).isEmpty, true, "option failed" )
+        deepEqual( option( 2 ).isDefined, true, "option failed" )
         done()
     } )
 } )

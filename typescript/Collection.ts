@@ -369,7 +369,7 @@ export abstract class Collection<A> implements Iterable<A> {
     get head(): A {
         const it: Iterator<A> = this[ Symbol.iterator ]()
         const n = it.next()
-        if ( n.done ) throw new Error( "No such element: head" )
+        if ( n.done ) throw new Error( "No such element" )
         return n.value
     }
 

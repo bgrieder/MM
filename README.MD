@@ -109,7 +109,7 @@ function none(): Option<A>
 function some<A>( value?: A ): Option<A>
 
 /**
- * Create a None if value is undefined or null
+ * Create a None if value is undefined or null or NaN
  * otherwise create a Some holding that value
  */
 function option<A>(value?: A): Option<A>
@@ -121,4 +121,49 @@ The most idiomatic way to use an Option is to treat it as a collection or monad 
 const name = option( request.getParameter('name') )
 const upper = name.map( n => n.trim() ).filter( n => n.length !== 0 ).map( n => n.toUpperCase() )
 console.log(upper.getOrElse( () =>  "" ) )
+```
+
+Try
+---
+A Try represents a computation that may either result in an error, or return a successfully computed value.
+
+A computation can be created by passing function without arguments to `tri()`.
+
+```typescript
+/**
+ * Wraps this computation in a Try
+ */
+function tri<A>( computation: ( ) => A ): Try<A>
+```
+Please note that the function is spelled with an 'i' to avoid a conflict with the reserved keyword `try`
+
+As with other monads of this library, `Try` is lazy and the computation will only be performed when attempting to "extract" a result.
+
+What is interesting with `Try` is the ability to chain error throwing functions with a fail fast behavior, and
+potentially recover from these error(s)
+
+```typescript
+function divide( numerator: any, denominator: any ): Try<number> {
+
+    const parseNumerator = () => option( parseFloat( numerator ) ).orThrow( () => "Invalid numerator" );
+    const parseDenominator = () => option( parseFloat( denominator ) ).orThrow( () => "Invalid denominator" );
+
+    //chain error throwing functions
+    return tri( parseNumerator ).flatMap( num => tri( parseDenominator ).map( den => num / den ) )
+}
+
+//now, divide(), can itself be chained
+divide(num, den).map(x => x*2)
+
+//or can be "recovered" from
+
+divide( num, den )
+    .recover( ( e: Error ) => {
+                console.log('Divide failed. '+e.message+'. Returning Infinity')
+                return Infinity
+            } )
+   .get
+
+//divide('blah',3) -> Infinity
+
 ```
