@@ -8,7 +8,13 @@ A small library that implements a few useful Monads for functional programming.
  - based on iterators with lazy evaluation
  - largely inspired from Scala
  - typings automatically loaded when programming in Typescript
- 
+ - excellent tests coverage
+
+ **Available**
+
+  - `Seq`: an ordered sequence of values with numerous methods to manipulate it
+  - `Option` (aka Maybe): represents optional values and avoids ugly tests for `null`, `undefined` or `NaN`
+  - `Try`: a computation that may either result in an error, or return a successfully computed value and that may be easily chained with other computations
  
 **Write shorter immutable code**
  
@@ -53,7 +59,7 @@ MIT
 TODO, Contributing, etc..
 --------------------------
 
-Most Wanted: `Try`, `Range`, `Either`,...
+Most Wanted: `Range`, `Either`,...
 
 I work on this library sporadically.
 
