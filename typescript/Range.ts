@@ -1,15 +1,13 @@
 /**
  * Created by Bruno Grieder.
  */
-import {Iterator} from './Iter'
-import {none, Option, some} from './Option'
-import {Collection} from './Collection'
+import {Seq} from './Seq'
 
 
 /**
- * The Range class represents integer values in range [start;end) with non-zero step value step
+ * The Range class represents numeric values in range [start;end) with non-zero step value step
  */
-export class Range extends Collection<number> {
+export class Range extends Seq<number> {
 
     static from( lengthOrStart: number, end?: number, step?: number ): Range {
         let rstart: number, rend: number, rstep: number
@@ -34,7 +32,6 @@ export class Range extends Collection<number> {
                 let current = rstart
                 return {
                     next: (): { done: boolean, value?: number } => {
-                        console.log( 'VALUE', current )
                         const done = rstep <= 0 ? current < rend : current > rend
                         const value = done ? void 0 : current
                         current = current + rstep
@@ -58,67 +55,21 @@ export class Range extends Collection<number> {
         return new Range( iter )
     }
 
-    /**
-     * Finds the first element of the Range for which the given partial function is defined, and applies the partial function to it.
-     */
-    collectFirst<B>( filter: ( value: number ) => boolean ): ( mapper: ( value: number ) => B ) => Option<B> {
-        return ( mapper: ( value: number ) => B ) => {
-            try {
-                return some<B>( this.filter( filter ).map( mapper ).head )
-            }
-            catch ( e ) {
-                return none()
-            }
-        }
-    }
-
-    /**
-     * Finds the first value produced by the Range satisfying a predicate, if any.
-     */
-    find( p: ( value: number ) => boolean ): Option<number> {
-        const it: Iterator<number> = this[ Symbol.iterator ]()
-        for ( let n = it.next(); !n.done; n = it.next() ) {
-            if ( p( n.value ) ) return some<number>( n.value )
-        }
-        return none()
-    }
-
-    /**
-     * Optionally selects the first element.
-     */
-    get headOption(): Option<number> {
-        try {
-            return some( this.head )
-        }
-        catch ( e ) {
-            return none()
-        }
-    }
-
-
-    // init: collection.Range<A>
-    // Selects all elements except the last.
-
-    // inits: collection.Iterator<collection.Range<A>>
-    // Iterates over the inits of this iterable collection.
-
-    /**
-     * Optionally selects the last element.
-     */
-    get lastOption(): Option<number> {
-        try {
-            return some( this.last )
-        }
-        catch ( e ) {
-            return none()
-        }
-    }
 
 }
 
-
+/**
+ * Create a range of integers of the specified length starting at 0
+ */
 export function range( length: number ): Range;
+
+/**
+ * Create a range from the specified start to the element end-1 included  in step of 1
+ */
 export function range( start: number, end: number ): Range
+/**
+ * Create a range from start to end-step included
+ */
 export function range( start: number, end: number, step: number ): Range
 export function range( lengthOrStart: number, end?: number, step?: number ): Range {
     return Range.from( lengthOrStart, end, step )

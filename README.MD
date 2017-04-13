@@ -3,11 +3,10 @@ MM
 
 **A few  Missing Monads for Javascript and Typescript.**
 
-
-  - `Seq`: an ordered sequence of values with numerous methods to manipulate it
   - `Option` (aka Maybe): represents optional values and avoids ugly tests for `null`, `undefined` or `NaN`
+  - `Seq`: an ordered sequence of values with numerous methods to manipulate it
+  - `Range`: numeric values in range [start;end) with non-zero step value step
   - `Try`: a computation that may either result in an error, or return a successfully computed value and that may be easily chained with other computations
-
 
 A small library that implements a few useful Monads for functional programming.
  - no external dependencies
@@ -71,33 +70,7 @@ For new Monads, please get inspiration from the Scala definitions and extend `Co
 
 API
 ===
-  
-Seq
----
-A Seq is an ordered sequence of values
 
-```typescript
-/**
- * Create a Seq
- */
-function seq<A>( ...values: any[]  ): Seq<A>
-```
-
- A `Seq` can be created from
-
-   - a list of disctrete values e.g. `seq( 1, 2, 3 )`
-   - any `Iterable` including an Array, a String, another `Seq`, an ES6 `Map`, etc... e.g. `seq( [1 ,2, 3] )`, `seq('abcd')`
-
-
- Examples:
-
-  ```typescript
-  seq('dlroW olleH').reverse.mkString(' ')    // 'H e l l o   W o r l d'
-
-  seq(1, 2, 'a', 3, 'b', 4).collect( n => !isNaN(n) )( n => n*2 ).mkString('[', ',', ']')    // '[2,4,6,8]'
-
-  seq( seq( [1, 2] ), 3, seq( 4, 5 ) ).flatten().toArray // [ 1, 2, 3, 4, 5 ]
-  ```
 
 Option
 ------
@@ -129,6 +102,66 @@ The most idiomatic way to use an Option is to treat it as a collection or monad 
 const name = option( request.getParameter('name') )
 const upper = name.map( n => n.trim() ).filter( n => n.length !== 0 ).map( n => n.toUpperCase() )
 console.log(upper.getOrElse( () =>  "" ) )
+```
+
+Seq
+---
+A Seq is an ordered sequence of values
+
+```typescript
+/**
+ * Create a Seq
+ */
+function seq<A>( ...values: any[]  ): Seq<A>
+```
+
+ A `Seq` can be created from
+
+   - a list of disctrete values e.g. `seq( 1, 2, 3 )`
+   - any `Iterable` including an Array, a String, another `Seq`, an ES6 `Map`, etc... e.g. `seq( [1 ,2, 3] )`, `seq('abcd')`
+
+
+ Examples:
+
+  ```typescript
+  seq('dlroW olleH').reverse.mkString(' ')    // 'H e l l o   W o r l d'
+
+  seq(1, 2, 'a', 3, 'b', 4).collect( n => !isNaN(n) )( n => n*2 ).mkString('[', ',', ']')    // '[2,4,6,8]'
+
+  seq( seq( [1, 2] ), 3, seq( 4, 5 ) ).flatten().toArray // [ 1, 2, 3, 4, 5 ]
+  ```
+
+Range
+-----
+The Range class represents numeric values in range [start;end) with non-zero step value step.
+A Range is a special case of Seq.
+
+```typescript
+/**
+ * Create a range of integers of the specified length starting at 0
+ */
+export function range( length: number ): Range;
+
+/**
+ * Create a range from the specified start to the element end-1 included  in step of 1
+ */
+export function range( start: number, end: number ): Range
+
+/**
+ * Create a range from start to end-step included
+ */
+export function range( start: number, end: number, step: number ): Range
+```
+
+Ranges are not indexed but based on (lazy) iterators.
+
+ - it is therefore possible to manipulate `Infinity` in Ranges:
+```javascript
+range(0, Infinity).take(10).toArray   //[ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+ ```
+ - however, accessing elements by index is slow. When the range is small, convert it to an array if multiple accesses are required
+```javascript
+seq(range(1000).toArray).at(3)
 ```
 
 Try
