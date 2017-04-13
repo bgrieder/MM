@@ -7,12 +7,10 @@ import {option, Option} from './Option'
 export class Try<A> {
 
     static from<A>( value: any ): Try<A> {
-        if ( typeof value[ Symbol.iterator ] === 'undefined' ) {
-            if ( typeof value === 'function' ) {
-                return new Try<A>( value )
-            }
-            return new Try<A>( () => value )
+        if ( typeof value === 'function' ) {
+            return new Try<A>( value )
         }
+        return new Try<A>( () => value )
     }
 
     private readonly _computation: ( ...args: any[] ) => A
@@ -52,7 +50,7 @@ export class Try<A> {
      * Applies the given mapper to this computation if it is a Success and the filter is satisfied
      */
     collect<B>( filter: () => boolean ): ( mapper: ( value: A ) => B ) => Try<B> {
-        return ( mapper: ( value: A ) => B ) => this.filter(filter).map(mapper)
+        return ( mapper: ( value: A ) => B ) => this.filter( filter ).map( mapper )
     }
 
     /**
@@ -254,6 +252,6 @@ export class Try<A> {
 /**
  * Wraps this computation in a Try
  */
-export function tri<A>( computation: ( ) => A ): Try<A> {
+export function tri<A>( computation: () => A ): Try<A> {
     return Try.from<A>( computation )
 }
