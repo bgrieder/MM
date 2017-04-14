@@ -60,9 +60,7 @@ MIT
 TODO, Contributing, etc..
 --------------------------
 
-Most Wanted: `Range`, `Either`,...
-
-I work on this library sporadically.
+Most Wanted: `Either`,...
 
 You are most welcome to contribute by opening new Pull Requests.
 For new Monads, please get inspiration from the Scala definitions and extend `Collection` for the implementation
