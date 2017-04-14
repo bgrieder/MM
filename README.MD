@@ -133,7 +133,7 @@ function seq<A>( ...values: any[]  ): Seq<A>
 
 Range
 -----
-The Range class represents numeric values in range [start;end) with non-zero step value step.
+The Range class represents numeric values in range with non-zero step value step.
 A Range is a special case of Seq.
 
 ```typescript
@@ -143,26 +143,20 @@ A Range is a special case of Seq.
 export function range( length: number ): Range;
 
 /**
- * Create a range from the specified start to the element end-1 included  in step of 1
+ * Create a range from the specified start to the element (end - 1) included in steps of 1
  */
 export function range( start: number, end: number ): Range
 
 /**
- * Create a range from start to end-step included
+ * Create a range from start to (end - step) included
  */
 export function range( start: number, end: number, step: number ): Range
 ```
 
-Ranges are not indexed but based on (lazy) iterators.
-
- - it is therefore possible to manipulate `Infinity` in Ranges:
+Ranges are not indexed but based on (lazy) iterators; it is therefore possible to manipulate `Infinity` in Ranges:
 ```javascript
 range(0, Infinity).take(10).toArray   //[ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
  ```
- - however, accessing elements by index is slow. When the range is small, convert it to an array if multiple accesses are required
-```javascript
-seq(range(1000).toArray).at(3)
-```
 
 Try
 ---
