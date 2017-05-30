@@ -8,7 +8,7 @@ MM
   - `Range`: numeric values in range [start;end) with non-zero step value step
   - `Try`: a computation that may either result in an error, or return a successfully computed value and that may be easily chained with other computations
 
-A small library that implements a few useful Monads for functional programming.
+A small library with no external dependencies that implements a few useful Monads for functional programming.
  - no external dependencies
  - works with ES5
  - based on iterators with lazy evaluation
