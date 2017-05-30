@@ -40,10 +40,11 @@ const value = option(input).map(calculateFromInput).getOrElse(getDefaultValue)
 **Write lazy evaluated code**
   
 ```javascript
-seq(hugeArray).drop(2).map(expensiveOp).takeFirst(3)
+const mySeq = seq(hugeArray).drop(2).map(expensiveOp).takeFirst(3)
+mySeq.toArray
   
 ```
-is not evaluated (iterated) until `toArray` is called on it, and when it is, only five iterations on the Seq and 3 calls to `map` are performed
+`mySeq` is not evaluated (iterated) until `toArray` is called on it, and when it is, only five iterations on the Seq and 3 calls to `map` are performed
   
 Usage
 -----
