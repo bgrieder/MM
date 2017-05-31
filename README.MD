@@ -139,17 +139,17 @@ A Range is a special case of Seq.
 /**
  * Create a range of integers of the specified length starting at 0
  */
-export function range( length: number ): Range;
+function range( length: number ): Range;
 
 /**
  * Create a range from the specified start to the element (end - 1) included in steps of 1
  */
-export function range( start: number, end: number ): Range
+function range( start: number, end: number ): Range
 
 /**
  * Create a range from start to (end - step) included
  */
-export function range( start: number, end: number, step: number ): Range
+function range( start: number, end: number, step: number ): Range
 ```
 
 Ranges are not indexed but based on (lazy) iterators; it is therefore possible to manipulate `Infinity` in Ranges:
