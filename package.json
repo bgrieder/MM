@@ -1,6 +1,6 @@
 {
   "name": "m.m",
-  "version": "1.0.2-alpha.1",
+  "version": "1.0.2",
   "description": "A few missing monads for javascript and typescript",
   "private": false,
   "repository": {
