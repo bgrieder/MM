@@ -8,7 +8,7 @@
     "url": "git+https://github.com/bgrieder/MM.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "./node_modules/.bin/tsc",
     "test": "mocha dist/test"
   },
   "main": "dist/index.js",
