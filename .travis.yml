@@ -2,7 +2,7 @@ sudo: false
 language: node_js
 node_js: 7
 before_script:
-- npm run build
+- ./node_modules/.bin/tsc
 deploy:
   provider: npm
   email: bruno.grieder@gmail.com
