@@ -1,0 +1,47 @@
+import { Iterable, Iterator } from './Iter';
+export declare abstract class Collection<A> implements Iterable<A> {
+    protected _value: Iterable<A>;
+    protected constructor(value: any);
+    [Symbol.iterator](): Iterator<A>;
+    build<B>(next: () => {
+        done: boolean;
+        value?: B;
+    }): Collection<B>;
+    at(index: number): A;
+    collect<B>(filter: (value: A) => boolean): (mapper: (value: A) => B) => Collection<B>;
+    concat(that: Collection<A>): Collection<A>;
+    contains(elem: any): boolean;
+    count(p: (value: A) => boolean): number;
+    drop(n: number): Collection<A>;
+    dropWhile(p: (value: A) => Boolean): Collection<A>;
+    equals(that: Collection<A>): boolean;
+    exists(p: (value: A) => boolean): boolean;
+    filter(filter: (value: A) => boolean): Collection<A>;
+    filterNot(filter: (value: A) => boolean): Collection<A>;
+    flatMap<B>(f: (value: A, index?: number) => Collection<B>): Collection<B>;
+    flatten<U>(): Collection<U>;
+    foldLeft<B>(initialValue: B): (op: (accumulator: B, value: A, index?: number) => B) => B;
+    foldRight<B>(initialValue: B): (op: (accumulator: B, value: A, index?: number) => B) => B;
+    forall(p: (value: A) => boolean): boolean;
+    foreach(f: (value: A) => void): void;
+    readonly hasDefiniteSize: boolean;
+    readonly head: A;
+    indexOf(elem: A, from?: number): number;
+    readonly isEmpty: boolean;
+    readonly isIndexed: boolean;
+    readonly last: A;
+    readonly length: number;
+    map<B>(f: (value: A, index?: number) => B): Collection<B>;
+    mkString(sep?: string): string;
+    mkString(start?: string, sep?: string, end?: string): string;
+    readonly nonEmpty: boolean;
+    readonly reverse: Collection<A>;
+    readonly size: number;
+    slice(from: number, until: number): Collection<A>;
+    readonly sum: A;
+    readonly tail: Collection<A>;
+    take(n: number): Collection<A>;
+    readonly toArray: Array<A>;
+    readonly toIndexed: Collection<A>;
+    readonly toString: string;
+}
